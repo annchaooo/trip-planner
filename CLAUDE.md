@@ -1,11 +1,11 @@
-# CLAUDE.md - Trip Planner Mobile App
+# CLAUDE.md - WanderNote
 
 > **Documentation Version**: 1.0
 > **Last Updated**: 2025-12-08
-> **Project**: Trip Planner
-> **Description**: Mobile trip planning app with event scheduling, map integration, and expense tracking
-> **Features**: GitHub auto-backup, Task agents, technical debt prevention
-> **Framework**: React Native (JavaScript/TypeScript)
+> **Project**: WanderNote
+> **Description**: Mobile trip planning app for solo travelers, couples, and small groups (2-4 people) with themed city/village trips
+> **Features**: Trip planning with purpose/theme, Map reference, Journey notes (essays, photos, drawings), Budget & expense tracking, GitHub auto-backup
+> **Framework**: React Native (JavaScript/TypeScript) + Java Spring Boot API
 
 This file provides essential guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -131,11 +131,19 @@ gh repo clone username/repo-name
 
 ## 🏗️ PROJECT OVERVIEW
 
-**Trip Planner** is a React Native mobile app for personal and group trip planning with three core modules:
+**WanderNote** is a React Native mobile app for meaningful travel experiences, targeting solo travelers, couples, and small groups (2-4 people). Plan themed trips to cities/villages with comprehensive features:
 
-1. **Planner Module** - Schedule and organize daily events and activities
-2. **Map Module** - Visualize trip locations and plan routes with map integration
-3. **Budget/Expense Tracker** - Track trip expenses and manage budgets
+### Core Features:
+1. **Trip Planning with Purpose** - Create trips with specific themes/purposes (adventure, culture, food, relaxation, etc.)
+2. **Map Reference Module** - Visualize locations and routes for city/village exploration
+3. **Journey Notes & Documentation** - Rich note-taking: essays, articles, photos, drawings to capture experiences
+4. **Budget & Expense Tracker** - Set budgets pre-trip and track real expenses during travel
+
+### Target Users:
+- Solo travelers exploring independently
+- Couples planning romantic getaways
+- Small friend groups (2-4 people) coordinating adventures
+- Travelers who value documentation and storytelling
 
 ### 📁 **PROJECT STRUCTURE**
 ```

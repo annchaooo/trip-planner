@@ -1,24 +1,38 @@
-# Trip Planner Mobile App
+# WanderNote
 
-A React Native mobile application for planning personal trips and group adventures.
+*Your journey, beautifully documented.*
 
-## ✨ Features
+A React Native mobile application for meaningful travel experiences. Perfect for solo travelers, couples, and small groups (2-4 people) who want to plan themed trips and capture their adventures.
 
-### 📅 Planner Module
-- Schedule daily events and activities
-- Organize trip itineraries
-- Collaborate with friends on group trips
-- Set reminders and notifications
+## ✨ Core Features
 
-### 🗺️ Map Module
+### 🎯 Trip Planning with Purpose
+- Create trips with specific themes (adventure, culture, food, relaxation, etc.)
+- Target city/village destinations
+- Organize daily itineraries
+- Coordinate with small groups (2-4 people)
+- Collaborate with travel companions
+
+### 🗺️ Map Reference Module
 - Visualize trip locations on interactive maps
 - Plan routes between destinations
-- Discover nearby points of interest
+- Explore city/village layouts
 - Save favorite locations
+- Navigate to points of interest
 
-### 💰 Budget/Expense Tracker
-- Track trip expenses in real-time
-- Set and monitor budgets
+### 📝 Journey Notes & Documentation
+- **Rich note-taking capabilities:**
+  - Write essays and travel articles
+  - Capture journey logs and reflections
+  - Upload and organize photos
+  - Create drawings and sketches
+- Document experiences in real-time
+- Build a personal travel story
+
+### 💰 Budget & Expense Tracker
+- Set trip budgets before traveling
+- Track real expenses during your journey
+- Monitor spending against budget
 - Split costs with travel companions
 - Generate expense reports
 - Support for multiple currencies
@@ -50,11 +64,12 @@ trip/
 
 ## 🛠️ Tech Stack
 
-- **Framework**: React Native
-- **Language**: JavaScript/TypeScript
+- **Frontend**: React Native (JavaScript/TypeScript)
+- **Backend**: Java Spring Boot REST API
 - **Maps**: Google Maps / Mapbox (TBD)
-- **Backend**: Firebase / Custom API (TBD)
 - **State Management**: React Context / Redux (TBD)
+- **Target Audience**: Solo travelers, couples, small groups (2-4 people)
+- **Monetization**: Free app
 
 ## 📖 Development Guidelines
 
