@@ -2,15 +2,19 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { CURRENCY_INFO } from '@/lib/currency'
 
 export function TripForm() {
   const [name, setName] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [budget, setBudget] = useState('')
+  const [budgetCurrency, setBudgetCurrency] = useState('TWD')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+
+  const currencyInfo = CURRENCY_INFO[budgetCurrency]
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,7 +36,8 @@ export function TripForm() {
           name,
           start_date: startDate,
           end_date: endDate,
-          budget: budget ? parseInt(budget) : null,
+          budget: budget ? parseFloat(budget) : null,
+          budget_currency: budgetCurrency,
         }),
       })
 
@@ -107,18 +112,43 @@ export function TripForm() {
         <label htmlFor="budget" className="block text-sm font-semibold text-gray-700 mb-2">
           Budget (optional)
         </label>
-        <div className="relative">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-          <input
-            id="budget"
-            type="number"
-            value={budget}
-            onChange={(e) => setBudget(e.target.value)}
-            placeholder="0"
-            min="0"
-            className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900 placeholder-gray-400"
-          />
+        <div className="flex gap-3">
+          <div className="relative flex-1">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
+              {currencyInfo?.symbol || '$'}
+            </span>
+            <input
+              id="budget"
+              type="number"
+              value={budget}
+              onChange={(e) => setBudget(e.target.value)}
+              placeholder="0"
+              min="0"
+              step="0.01"
+              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900 placeholder-gray-400"
+            />
+          </div>
+          <select
+            id="budgetCurrency"
+            value={budgetCurrency}
+            onChange={(e) => setBudgetCurrency(e.target.value)}
+            className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900 bg-white"
+          >
+            <option value="TWD">TWD (NT$)</option>
+            <option value="USD">USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="GBP">GBP (£)</option>
+            <option value="JPY">JPY (¥)</option>
+            <option value="CNY">CNY (¥)</option>
+            <option value="KRW">KRW (₩)</option>
+            <option value="THB">THB (฿)</option>
+            <option value="AUD">AUD ($)</option>
+            <option value="CAD">CAD ($)</option>
+          </select>
         </div>
+        <p className="text-xs text-gray-500 mt-1">
+          Set your budget in your home currency. Expenses in other currencies will be converted.
+        </p>
       </div>
 
       <button

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useId } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -44,67 +44,122 @@ export function TripMap({ destinations, highlightedId, height = '300px' }: TripM
   const mapRef = useRef<L.Map | null>(null)
   const markersRef = useRef<Map<string, L.Marker>>(new Map())
   const containerRef = useRef<HTMLDivElement>(null)
+  const mapId = useId()
+  const isInitializedRef = useRef(false)
 
-  // Initialize map
+  // Create a unique key from destination IDs to detect trip changes
+  const destinationKey = destinations.map(d => d.id).sort().join(',')
+
+  // Initialize map - re-run when destinations change (different trip)
   useEffect(() => {
     if (typeof window === 'undefined' || !containerRef.current || destinations.length === 0) return
-    if (mapRef.current) return // Already initialized
 
-    // Create map
-    const map = L.map(containerRef.current)
-    mapRef.current = map
+    // Prevent double initialization in strict mode
+    const container = containerRef.current
 
-    // Add OpenStreetMap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    }).addTo(map)
-
-    // Add markers for each destination
-    destinations.forEach((dest) => {
-      const marker = L.marker([dest.latitude, dest.longitude], {
-        icon: createIcon(false),
-      })
-        .addTo(map)
-        .bindPopup(`<b>${dest.city}</b><br>${dest.country}`)
-      markersRef.current.set(dest.id, marker)
-    })
-
-    // Draw lines connecting destinations in order
-    if (destinations.length > 1) {
-      const latlngs = destinations.map((d) => [d.latitude, d.longitude] as [number, number])
-      L.polyline(latlngs, {
-        color: '#10b981',
-        weight: 2,
-        opacity: 0.6,
-        dashArray: '5, 10',
-      }).addTo(map)
+    // Check if container already has a map
+    if ((container as HTMLDivElement & { _leaflet_id?: number })._leaflet_id) {
+      return
     }
 
-    // Fit bounds to show all markers
-    if (destinations.length === 1) {
-      map.setView([destinations[0].latitude, destinations[0].longitude], 10)
-    } else {
-      const bounds = L.latLngBounds(
-        destinations.map((d) => [d.latitude, d.longitude] as [number, number])
-      )
-      map.fitBounds(bounds, { padding: [30, 30] })
-    }
-
-    // Cleanup
-    return () => {
-      map.remove()
+    // Clean up existing map first
+    if (mapRef.current) {
+      try {
+        mapRef.current.remove()
+      } catch {
+        // Ignore errors during cleanup
+      }
       mapRef.current = null
       markersRef.current.clear()
     }
-  }, [destinations])
+
+    // Small delay to ensure DOM is ready
+    const initMap = () => {
+      if (!containerRef.current) return
+
+      // Double check container doesn't already have a map
+      if ((containerRef.current as HTMLDivElement & { _leaflet_id?: number })._leaflet_id) {
+        return
+      }
+
+      try {
+        // Create map
+        const map = L.map(containerRef.current)
+        mapRef.current = map
+        isInitializedRef.current = true
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        }).addTo(map)
+
+        // Add markers for each destination
+        destinations.forEach((dest) => {
+          const marker = L.marker([dest.latitude, dest.longitude], {
+            icon: createIcon(false),
+          })
+            .addTo(map)
+            .bindPopup(`<b>${dest.city}</b><br>${dest.country}`)
+          markersRef.current.set(dest.id, marker)
+        })
+
+        // Draw lines connecting destinations in order (only within this trip)
+        if (destinations.length > 1) {
+          const latlngs = destinations.map((d) => [d.latitude, d.longitude] as [number, number])
+          L.polyline(latlngs, {
+            color: '#10b981',
+            weight: 2,
+            opacity: 0.6,
+            dashArray: '5, 10',
+          }).addTo(map)
+        }
+
+        // Fit bounds to show all markers
+        if (destinations.length === 1) {
+          map.setView([destinations[0].latitude, destinations[0].longitude], 10)
+        } else {
+          const bounds = L.latLngBounds(
+            destinations.map((d) => [d.latitude, d.longitude] as [number, number])
+          )
+          map.fitBounds(bounds, { padding: [30, 30] })
+        }
+      } catch (error) {
+        console.error('Error initializing map:', error)
+      }
+    }
+
+    // Use requestAnimationFrame to ensure DOM is ready
+    const frameId = requestAnimationFrame(initMap)
+
+    // Cleanup
+    return () => {
+      cancelAnimationFrame(frameId)
+      if (mapRef.current) {
+        try {
+          mapRef.current.remove()
+        } catch {
+          // Ignore errors during cleanup
+        }
+        mapRef.current = null
+        markersRef.current.clear()
+        isInitializedRef.current = false
+      }
+    }
+  }, [destinationKey]) // Re-initialize when destinations change
 
   // Update marker styles when highlighted changes
   useEffect(() => {
+    if (!isInitializedRef.current) return
+
     markersRef.current.forEach((marker, id) => {
-      const isHighlighted = id === highlightedId
-      marker.setIcon(createIcon(isHighlighted))
-      if (isHighlighted) {
-        marker.openPopup()
+      try {
+        const isHighlighted = id === highlightedId
+        marker.setIcon(createIcon(isHighlighted))
+        if (isHighlighted) {
+          marker.openPopup()
+        }
+      } catch {
+        // Ignore errors if marker is not ready
       }
     })
   }, [highlightedId])
@@ -122,6 +177,7 @@ export function TripMap({ destinations, highlightedId, height = '300px' }: TripM
 
   return (
     <div
+      key={mapId}
       ref={containerRef}
       className="rounded-xl overflow-hidden w-full"
       style={{ height }}

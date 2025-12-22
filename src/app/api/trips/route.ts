@@ -59,6 +59,7 @@ export async function POST(request: Request) {
       start_date: body.start_date,
       end_date: body.end_date,
       budget: body.budget || null,
+      budget_currency: body.budget_currency || 'TWD',
     })
     .select()
     .single()

@@ -126,7 +126,7 @@ export default async function TripDetailPage({
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
             <Link
               href={`/trips/${trip.id}/itinerary`}
               className="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg font-medium hover:bg-emerald-200 transition-colors"
@@ -138,6 +138,12 @@ export default async function TripDetailPage({
               className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
             >
               Manage Budget
+            </Link>
+            <Link
+              href={`/trips/${trip.id}/notes`}
+              className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg font-medium hover:bg-purple-200 transition-colors"
+            >
+              Journey Notes
             </Link>
           </div>
         </div>
