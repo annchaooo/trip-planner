@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { NoteForm } from '@/components/notes/NoteForm'
 import { NoteCard } from '@/components/notes/NoteCard'
-import { EditorialLayout } from '@/components/layout/EditorialLayout'
 
 interface Destination {
   id: string
@@ -37,10 +36,10 @@ interface Trip {
 interface NotesClientProps {
   trip: Trip
   initialNotes: Note[]
-  userEmail?: string
+  userEmail?: string // 保留不影響（目前 NotesClient 內不再使用 layout）
 }
 
-export function NotesClient({ trip, initialNotes, userEmail }: NotesClientProps) {
+export function NotesClient({ trip, initialNotes }: NotesClientProps) {
   const [showAddForm, setShowAddForm] = useState(false)
   const [notes, setNotes] = useState(initialNotes)
   const [filter, setFilter] = useState<'all' | 'essays' | 'photos' | 'saved'>('all')
@@ -58,7 +57,7 @@ export function NotesClient({ trip, initialNotes, userEmail }: NotesClientProps)
       })
 
       if (response.ok) {
-        setNotes(notes.filter(n => n.id !== noteId))
+        setNotes(notes.filter((n) => n.id !== noteId))
         router.refresh()
       }
     } catch (error) {
@@ -68,12 +67,13 @@ export function NotesClient({ trip, initialNotes, userEmail }: NotesClientProps)
 
   const handleToggleFavorite = async (noteId: string, isFavorite: boolean) => {
     try {
-      const note = notes.find(n => n.id === noteId)
+      const note = notes.find((n) => n.id === noteId)
       if (!note) return
 
-      setNotes(notes.map(n =>
-        n.id === noteId ? { ...n, is_favorite: isFavorite } : n
-      ))
+      // optimistic
+      setNotes(
+        notes.map((n) => (n.id === noteId ? { ...n, is_favorite: isFavorite } : n))
+      )
 
       const response = await fetch(`/api/notes/${noteId}`, {
         method: 'PUT',
@@ -85,9 +85,10 @@ export function NotesClient({ trip, initialNotes, userEmail }: NotesClientProps)
       })
 
       if (!response.ok) {
-        setNotes(notes.map(n =>
-          n.id === noteId ? { ...n, is_favorite: !isFavorite } : n
-        ))
+        // rollback
+        setNotes(
+          notes.map((n) => (n.id === noteId ? { ...n, is_favorite: !isFavorite } : n))
+        )
       }
     } catch (error) {
       console.error('Failed to update note:', error)
@@ -97,16 +98,16 @@ export function NotesClient({ trip, initialNotes, userEmail }: NotesClientProps)
   // Filter notes
   let filteredNotes = notes
   if (filter === 'essays') {
-    filteredNotes = filteredNotes.filter(n => n.type === 'essay')
+    filteredNotes = filteredNotes.filter((n) => n.type === 'essay')
   } else if (filter === 'photos') {
-    filteredNotes = filteredNotes.filter(n => n.image_url)
+    filteredNotes = filteredNotes.filter((n) => n.image_url)
   } else if (filter === 'saved') {
-    filteredNotes = filteredNotes.filter(n => n.is_favorite)
+    filteredNotes = filteredNotes.filter((n) => n.is_favorite)
   }
 
   // Sort by date (newest first)
-  filteredNotes = [...filteredNotes].sort((a, b) =>
-    new Date(b.date).getTime() - new Date(a.date).getTime()
+  filteredNotes = [...filteredNotes].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   )
 
   const formatTripDates = () => {
@@ -122,55 +123,45 @@ export function NotesClient({ trip, initialNotes, userEmail }: NotesClientProps)
     return `${startMonth} ${start.getDate()} – ${endMonth} ${end.getDate()}, ${year}`
   }
 
-  const heroNote = notes.find(n => n.image_url)
-  const photoCount = notes.filter(n => n.image_url).length
-  const essayCount = notes.filter(n => n.type === 'essay').length
-  const savedCount = notes.filter(n => n.is_favorite).length
+  const heroNote = notes.find((n) => n.image_url)
+  const photoCount = notes.filter((n) => n.image_url).length
+  const essayCount = notes.filter((n) => n.type === 'essay').length
+  const savedCount = notes.filter((n) => n.is_favorite).length
 
   return (
-    <EditorialLayout userEmail={userEmail}>
-      {/* Hero Section */}
+    <div className="w-full">
+      {/* Hero Section (full width) */}
       {heroNote?.image_url && (
         <div className="relative w-full">
           <div className="relative w-full aspect-[16/9] lg:aspect-[21/9]">
-            <Image
-              src={heroNote.image_url}
-              alt={trip.name}
-              fill
-              className="object-cover"
-              priority
-            />
+            <Image src={heroNote.image_url} alt={trip.name} fill className="object-cover" priority />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
           </div>
         </div>
       )}
 
-      {/* Content Well */}
-      <div className="content-well px-6 lg:px-8">
+      {/* ✅ Main content container: responsive + no max-width lock */}
+      <div className="w-full max-w-none px-4 sm:px-6 lg:px-10 xl:px-14 2xl:px-20 py-10 lg:py-14">
         {/* Headline Block */}
         <header className="py-12 lg:py-16">
-          {/* Top Rule */}
           <div className="rule-line mb-8" />
 
-          {/* Metadata */}
           <div className="flex items-center justify-center gap-4 mb-6">
             <span className="font-meta text-stone-400">{formatTripDates()}</span>
             {trip.destinations.length > 0 && (
               <>
                 <span className="text-stone-300">·</span>
                 <span className="font-meta text-stone-400">
-                  {trip.destinations.map(d => d.city).join(' · ')}
+                  {trip.destinations.map((d) => d.city).join(' · ')}
                 </span>
               </>
             )}
           </div>
 
-          {/* Title */}
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl text-center text-stone-900 mb-6">
             {trip.name}
           </h1>
 
-          {/* Stats */}
           <div className="flex items-center justify-center gap-8 text-sm">
             <div className="text-center">
               <p className="font-display text-2xl text-stone-900">{notes.length}</p>
@@ -188,13 +179,11 @@ export function NotesClient({ trip, initialNotes, userEmail }: NotesClientProps)
             </div>
           </div>
 
-          {/* Bottom Rule */}
           <div className="rule-line mt-8" />
         </header>
 
         {/* Navigation Bar */}
         <div className="flex items-center justify-between py-4 mb-8">
-          {/* Filters */}
           <div className="flex items-center gap-1">
             {[
               { key: 'all', label: 'All', count: notes.length },
@@ -206,9 +195,7 @@ export function NotesClient({ trip, initialNotes, userEmail }: NotesClientProps)
                 key={item.key}
                 onClick={() => setFilter(item.key as typeof filter)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  filter === item.key
-                    ? 'bg-[#1e40af] text-white'
-                    : 'text-stone-500 hover:bg-stone-100'
+                  filter === item.key ? 'bg-[#1e40af] text-white' : 'text-stone-500 hover:bg-stone-100'
                 }`}
               >
                 {item.label}
@@ -219,7 +206,6 @@ export function NotesClient({ trip, initialNotes, userEmail }: NotesClientProps)
             ))}
           </div>
 
-          {/* New Entry Button */}
           {!showAddForm && (
             <button
               onClick={() => setShowAddForm(true)}
@@ -245,7 +231,7 @@ export function NotesClient({ trip, initialNotes, userEmail }: NotesClientProps)
           </div>
         )}
 
-        {/* Entries / Latest Stories */}
+        {/* Entries */}
         {filteredNotes.length > 0 ? (
           <section className="pb-16">
             <div className="stories-grid">
@@ -262,18 +248,27 @@ export function NotesClient({ trip, initialNotes, userEmail }: NotesClientProps)
         ) : (
           !showAddForm && (
             <div className="py-16 text-center">
-              {/* Empty State */}
               <div className="w-20 h-20 mx-auto mb-6 relative">
                 <svg viewBox="0 0 80 80" fill="none" className="w-full h-full">
                   <circle cx="40" cy="40" r="36" stroke="#e7e5e4" strokeWidth="1.5" />
-                  <path d="M28 50 L40 30 L52 50" stroke="#1e40af" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M34 42 L40 32 L46 42" stroke="#4d7c0f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M28 50 L40 30 L52 50"
+                    stroke="#1e40af"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M34 42 L40 32 L46 42"
+                    stroke="#4d7c0f"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               </div>
 
-              <h2 className="font-display text-2xl text-stone-900 mb-3">
-                Begin Your Story
-              </h2>
+              <h2 className="font-display text-2xl text-stone-900 mb-3">Begin Your Story</h2>
               <p className="text-stone-500 mb-8 max-w-sm mx-auto leading-relaxed">
                 Every journey has a tale worth telling. Capture your first moment.
               </p>
@@ -292,37 +287,28 @@ export function NotesClient({ trip, initialNotes, userEmail }: NotesClientProps)
         )}
       </div>
 
-      {/* Latest Stories Footer (Olive Section) */}
+      {/* ✅ Saved Moments Footer: remove content-well width lock */}
       {savedCount > 0 && filter === 'all' && (
         <section className="bg-[#4d7c0f] py-16">
-          <div className="content-well px-6 lg:px-8">
+          <div className="w-full max-w-none px-4 sm:px-6 lg:px-10 xl:px-14 2xl:px-20">
             <div className="flex items-center gap-3 mb-8">
               <div className="w-8 h-px bg-white/30" />
               <span className="text-white/60 text-lg">✦</span>
               <div className="w-8 h-px bg-white/30" />
             </div>
 
-            <h2 className="font-display text-2xl text-white mb-2">
-              Saved Moments
-            </h2>
-            <p className="text-white/70 mb-8">
-              Your favorite memories from this journey
-            </p>
+            <h2 className="font-display text-2xl text-white mb-2">Saved Moments</h2>
+            <p className="text-white/70 mb-8">Your favorite memories from this journey</p>
 
             <div className="stories-grid">
               {notes
-                .filter(n => n.is_favorite)
+                .filter((n) => n.is_favorite)
                 .slice(0, 4)
                 .map((note) => (
                   <article key={note.id} className="editorial-card">
                     {note.image_url && (
                       <div className="relative aspect-[3/2]">
-                        <Image
-                          src={note.image_url}
-                          alt={note.title}
-                          fill
-                          className="object-cover"
-                        />
+                        <Image src={note.image_url} alt={note.title} fill className="object-cover" />
                       </div>
                     )}
                     <div className="p-5">
@@ -332,9 +318,7 @@ export function NotesClient({ trip, initialNotes, userEmail }: NotesClientProps)
                           day: 'numeric',
                         })}
                       </p>
-                      <h3 className="font-display text-lg text-stone-900 text-center">
-                        {note.title}
-                      </h3>
+                      <h3 className="font-display text-lg text-stone-900 text-center">{note.title}</h3>
                     </div>
                   </article>
                 ))}
@@ -342,6 +326,6 @@ export function NotesClient({ trip, initialNotes, userEmail }: NotesClientProps)
           </div>
         </section>
       )}
-    </EditorialLayout>
+    </div>
   )
 }

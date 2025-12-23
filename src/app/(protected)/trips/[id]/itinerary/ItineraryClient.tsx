@@ -164,7 +164,12 @@ export function ItineraryClient({ trip }: ItineraryClientProps) {
             <circle cx="40" cy="40" r="36" stroke="#e7e5e4" strokeWidth="1.5" />
             <circle cx="40" cy="32" r="8" stroke="#1e40af" strokeWidth="1.5" />
             <path d="M40 44 L40 52" stroke="#1e40af" strokeWidth="1.5" strokeLinecap="round" />
-            <path d="M32 56 C32 52 48 52 48 56" stroke="#4d7c0f" strokeWidth="1.5" strokeLinecap="round" />
+            <path
+              d="M32 56 C32 52 48 52 48 56"
+              stroke="#4d7c0f"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
           </svg>
         </div>
         <h3 className="font-display text-lg text-stone-900 mb-2">No destinations yet</h3>
@@ -185,58 +190,74 @@ export function ItineraryClient({ trip }: ItineraryClientProps) {
       <div className="editorial-card p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-display text-lg text-stone-900">Trip Map</h2>
-          <p className="text-sm text-stone-500">{trip.destinations.length} destination{trip.destinations.length !== 1 ? 's' : ''}</p>
+          <p className="text-sm text-stone-500">
+            {trip.destinations.length} destination{trip.destinations.length !== 1 ? 's' : ''}
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Map */}
-          <div className="lg:col-span-2">
+        {/* ✅ 改成：Map 全寬在上，Destinations 在下 */}
+        <div className="space-y-6">
+          {/* Map (full width, bigger & responsive height) */}
+          <div className="w-full">
+            {/* 手機不要太高、桌機用 vh 跟著螢幕變化 */}
             <TripMap
               destinations={trip.destinations}
               highlightedId={highlightedDestination}
-              height="300px"
+              height="70vh"
             />
+            <p className="text-xs text-stone-400 mt-2 text-center">
+              Hover a destination (or a day card) to highlight it on the map
+            </p>
           </div>
 
-          {/* Destinations Legend */}
+          {/* Destinations below the map */}
           <div className="space-y-2">
-            <p className="font-meta text-stone-500 text-sm mb-3">Destinations</p>
-            {trip.destinations.map((dest, index) => (
-              <button
-                key={dest.id}
-                onClick={() => {
-                  setSelectedDestination(dest.id)
-                  setHighlightedDestination(dest.id)
-                }}
-                onMouseEnter={() => setHighlightedDestination(dest.id)}
-                onMouseLeave={() => setHighlightedDestination(null)}
-                className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-left ${
-                  selectedDestination === dest.id
-                    ? 'bg-[#1e40af]/10 border border-[#1e40af]/30'
-                    : 'hover:bg-stone-50 border border-transparent'
-                }`}
-              >
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
-                  selectedDestination === dest.id
-                    ? 'bg-[#1e40af] text-white'
-                    : 'bg-stone-200 text-stone-600'
-                }`}>
-                  {index + 1}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium text-stone-900">{dest.city}</p>
-                  <p className="text-xs text-stone-500">{dest.country}</p>
-                </div>
-                {dest.start_date && dest.end_date && (
-                  <span className="text-xs text-stone-400">
-                    {new Date(dest.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                    {' - '}
-                    {new Date(dest.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  </span>
-                )}
-              </button>
-            ))}
-            <p className="text-xs text-stone-400 mt-3 text-center">
+            <p className="font-meta text-stone-500 text-sm mb-1">Destinations</p>
+
+            {/* ✅ 用 grid 讓閱讀更好：桌機更密、手機不擠 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {trip.destinations.map((dest, index) => (
+                <button
+                  key={dest.id}
+                  onClick={() => {
+                    setSelectedDestination(dest.id)
+                    setHighlightedDestination(dest.id)
+                  }}
+                  onMouseEnter={() => setHighlightedDestination(dest.id)}
+                  onMouseLeave={() => setHighlightedDestination(null)}
+                  className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-left ${
+                    selectedDestination === dest.id
+                      ? 'bg-[#1e40af]/10 border border-[#1e40af]/30'
+                      : 'hover:bg-stone-50 border border-stone-200'
+                  }`}
+                >
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
+                      selectedDestination === dest.id
+                        ? 'bg-[#1e40af] text-white'
+                        : 'bg-stone-200 text-stone-600'
+                    }`}
+                  >
+                    {index + 1}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-stone-900 truncate">{dest.city}</p>
+                    <p className="text-xs text-stone-500 truncate">{dest.country}</p>
+                  </div>
+
+                  {dest.start_date && dest.end_date && (
+                    <span className="text-xs text-stone-400 whitespace-nowrap">
+                      {new Date(dest.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      {' - '}
+                      {new Date(dest.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            <p className="text-xs text-stone-400 mt-2 text-center">
               Click a destination to add activities for it
             </p>
           </div>
@@ -247,7 +268,9 @@ export function ItineraryClient({ trip }: ItineraryClientProps) {
       <div className="editorial-card p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-display text-lg text-stone-900">Itinerary</h2>
-          <p className="text-sm text-stone-500">{days.length} day{days.length !== 1 ? 's' : ''}</p>
+          <p className="text-sm text-stone-500">
+            {days.length} day{days.length !== 1 ? 's' : ''}
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

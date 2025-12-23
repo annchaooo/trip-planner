@@ -31,7 +31,9 @@ export default async function BudgetPage({
 }) {
   const { id } = await params
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     redirect('/login')
@@ -56,14 +58,21 @@ export default async function BudgetPage({
 
   return (
     <EditorialLayout userEmail={user.email}>
-      <div className="content-well px-6 lg:px-8 py-12 lg:py-16">
+      {/* ✅ 改這裡：讓頁面寬度跟著瀏覽器變動 */}
+      <div className="w-full max-w-none px-4 sm:px-6 lg:px-10 xl:px-14 2xl:px-20 py-10 lg:py-14">
         {/* Breadcrumb */}
         <div className="mb-8">
           <Link
             href={`/trips/${trip.id}`}
             className="text-[#1e40af] hover:text-[#1e3a8a] font-medium flex items-center gap-1"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
             Back to {trip.name}

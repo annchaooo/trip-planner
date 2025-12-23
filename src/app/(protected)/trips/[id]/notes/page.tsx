@@ -1,6 +1,7 @@
 import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { NotesClient } from './NotesClient'
+import { EditorialLayout } from '@/components/layout/EditorialLayout'
 
 interface Destination {
   id: string
@@ -36,7 +37,9 @@ export default async function NotesPage({
 }) {
   const { id } = await params
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     redirect('/login')
@@ -44,10 +47,12 @@ export default async function NotesPage({
 
   const { data: trip, error } = await supabase
     .from('trips')
-    .select(`
+    .select(
+      `
       id, name, start_date, end_date,
       destinations (id, city, country)
-    `)
+    `
+    )
     .eq('id', id)
     .eq('user_id', user.id)
     .single()
@@ -58,19 +63,22 @@ export default async function NotesPage({
 
   const { data: notes } = await supabase
     .from('notes')
-    .select(`
+    .select(
+      `
       *,
       destinations (city, country)
-    `)
+    `
+    )
     .eq('trip_id', id)
     .order('date', { ascending: false })
     .order('created_at', { ascending: false })
 
   return (
-    <NotesClient
-      trip={trip as Trip}
-      initialNotes={(notes || []) as Note[]}
-      userEmail={user.email}
-    />
+    <EditorialLayout userEmail={user.email}>
+      {/* ✅ 讓頁面跟著瀏覽器變寬 */}
+      <div className="w-full max-w-none px-4 sm:px-6 lg:px-10 xl:px-14 2xl:px-20 py-10 lg:py-14">
+        <NotesClient trip={trip as Trip} initialNotes={(notes || []) as Note[]} userEmail={user.email} />
+      </div>
+    </EditorialLayout>
   )
 }

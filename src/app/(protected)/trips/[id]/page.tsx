@@ -31,7 +31,9 @@ export default async function TripDetailPage({
 }) {
   const { id } = await params
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     redirect('/login')
@@ -39,10 +41,12 @@ export default async function TripDetailPage({
 
   const { data: trip, error } = await supabase
     .from('trips')
-    .select(`
+    .select(
+      `
       *,
       destinations (*)
-    `)
+    `
+    )
     .eq('id', id)
     .eq('user_id', user.id)
     .single()
@@ -69,14 +73,21 @@ export default async function TripDetailPage({
 
   return (
     <EditorialLayout userEmail={user.email}>
-      <div className="content-well px-6 lg:px-8 py-12 lg:py-16">
+      {/* ✅ 讓整頁跟著瀏覽器變寬：移除 content-well 限制 */}
+      <div className="w-full max-w-none px-4 sm:px-6 lg:px-10 xl:px-14 2xl:px-20 py-10 lg:py-14">
         {/* Breadcrumb */}
         <div className="mb-8">
           <Link
             href="/dashboard"
             className="text-[#1e40af] hover:text-[#1e3a8a] font-medium flex items-center gap-1"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
             Back to Journeys
@@ -104,14 +115,20 @@ export default async function TripDetailPage({
             </div>
             <div className="w-px h-10 bg-stone-200" />
             <div className="text-center">
-              <p className="font-display text-2xl text-stone-900">{(trip.destinations || []).length}</p>
+              <p className="font-display text-2xl text-stone-900">
+                {(trip.destinations || []).length}
+              </p>
               <p className="font-meta text-stone-400">Destinations</p>
             </div>
-            {trip.budget && (
+
+            {/* ✅ budget=0 也要能顯示 */}
+            {trip.budget !== null && (
               <>
                 <div className="w-px h-10 bg-stone-200" />
                 <div className="text-center">
-                  <p className="font-display text-2xl text-[#4d7c0f]">${trip.budget.toLocaleString()}</p>
+                  <p className="font-display text-2xl text-[#4d7c0f]">
+                    ${trip.budget.toLocaleString()}
+                  </p>
                   <p className="font-meta text-stone-400">Budget</p>
                 </div>
               </>

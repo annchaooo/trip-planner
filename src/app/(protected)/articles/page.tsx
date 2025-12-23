@@ -58,7 +58,7 @@ export default async function ArticlesPage() {
 
   return (
     <EditorialLayout userEmail={user.email}>
-      <div className="content-well px-6 lg:px-8 py-12 lg:py-16">
+      <div className="w-full max-w-none px-4 sm:px-6 lg:px-10 xl:px-14 2xl:px-20 py-10 lg:py-14">
         {/* Header */}
         <header className="mb-12">
           <div className="rule-line mb-8" />
@@ -66,7 +66,7 @@ export default async function ArticlesPage() {
           <div className="text-center">
             <p className="font-meta text-[#1e40af] mb-2">Your Collection</p>
             <h1 className="font-display text-4xl md:text-5xl text-stone-900 mb-4">
-              All Journal Entries
+              Core Meomory
             </h1>
             <p className="text-stone-500 max-w-md mx-auto">
               Every story, every photo, every moment from your journeys.

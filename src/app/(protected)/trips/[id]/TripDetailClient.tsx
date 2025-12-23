@@ -1,16 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { DestinationForm } from '@/components/destinations/DestinationForm'
 import { DestinationCard } from '@/components/destinations/DestinationCard'
 
 // Dynamic import for map (SSR disabled)
-const TripMap = dynamic(() => import('@/components/map/TripMap').then(mod => mod.TripMap), {
+const TripMap = dynamic(() => import('@/components/map/TripMap').then((mod) => mod.TripMap), {
   ssr: false,
   loading: () => (
-    <div className="bg-stone-100 rounded-lg h-[400px] flex items-center justify-center">
+    <div className="bg-stone-100 rounded-lg h-full flex items-center justify-center">
       <p className="text-stone-500">Loading map...</p>
     </div>
   ),
@@ -42,8 +42,13 @@ interface TripDetailClientProps {
 
 export function TripDetailClient({ trip }: TripDetailClientProps) {
   const [showAddForm, setShowAddForm] = useState(false)
-  const [destinations, setDestinations] = useState(trip.destinations || [])
+  const [destinations, setDestinations] = useState<Destination[]>(trip.destinations || [])
   const router = useRouter()
+
+  // ✅ Keep local state in sync if trip.destinations changes after router.refresh()
+  useEffect(() => {
+    setDestinations(trip.destinations || [])
+  }, [trip.destinations])
 
   const handleAddSuccess = () => {
     setShowAddForm(false)
@@ -59,7 +64,8 @@ export function TripDetailClient({ trip }: TripDetailClientProps) {
       })
 
       if (response.ok) {
-        setDestinations(destinations.filter(d => d.id !== destinationId))
+        // Optimistic UI update
+        setDestinations((prev) => prev.filter((d) => d.id !== destinationId))
         router.refresh()
       }
     } catch (error) {
@@ -76,6 +82,7 @@ export function TripDetailClient({ trip }: TripDetailClientProps) {
             {destinations.length} destination{destinations.length !== 1 ? 's' : ''} planned
           </p>
         </div>
+
         {!showAddForm && (
           <button
             onClick={() => setShowAddForm(true)}
@@ -101,14 +108,15 @@ export function TripDetailClient({ trip }: TripDetailClientProps) {
 
       {destinations.length > 0 ? (
         <>
-          {/* Map */}
-          <div className="mb-6">
-            <TripMap destinations={destinations} height="400px" />
+          {/* ✅ Map: responsive height that adapts to viewport */}
+          <div className="mb-6 h-[360px] sm:h-[420px] lg:h-[70vh]">
+            <TripMap destinations={destinations} height="100%" />
           </div>
 
           {/* Destination Cards */}
           <div className="stories-grid">
             {destinations
+              .slice()
               .sort((a, b) => a.order_index - b.order_index)
               .map((destination) => (
                 <DestinationCard
@@ -127,11 +135,18 @@ export function TripDetailClient({ trip }: TripDetailClientProps) {
                 <circle cx="40" cy="40" r="36" stroke="#e7e5e4" strokeWidth="1.5" />
                 <circle cx="40" cy="32" r="8" stroke="#1e40af" strokeWidth="1.5" />
                 <path d="M40 44 L40 52" stroke="#1e40af" strokeWidth="1.5" strokeLinecap="round" />
-                <path d="M32 56 C32 52 48 52 48 56" stroke="#4d7c0f" strokeWidth="1.5" strokeLinecap="round" />
+                <path
+                  d="M32 56 C32 52 48 52 48 56"
+                  stroke="#4d7c0f"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
               </svg>
             </div>
+
             <h3 className="font-display text-lg text-stone-900 mb-2">No destinations yet</h3>
             <p className="text-stone-500 mb-6">Add your first destination to start planning</p>
+
             <button
               onClick={() => setShowAddForm(true)}
               className="inline-flex items-center gap-2 px-6 py-3 bg-[#1e40af] text-white rounded-lg font-medium hover:bg-[#1e3a8a] transition-colors"

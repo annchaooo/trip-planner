@@ -35,7 +35,8 @@ export default async function DashboardPage() {
 
   return (
     <EditorialLayout userEmail={user.email}>
-      <div className="content-well px-6 lg:px-8 py-12 lg:py-16">
+      <div className="w-full max-w-none px-4 sm:px-6 lg:px-10 xl:px-14 2xl:px-20 py-10 lg:py-14">
+
         {/* Header */}
         <header className="mb-12">
           {/* Top Rule */}
