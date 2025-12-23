@@ -3,12 +3,12 @@
 import { useState } from 'react'
 
 const EXPENSE_CATEGORIES = [
-  { value: 'transport', label: 'Transport', icon: '🚗' },
-  { value: 'accommodation', label: 'Accommodation', icon: '🏨' },
-  { value: 'food', label: 'Food & Drinks', icon: '🍽️' },
-  { value: 'activities', label: 'Activities', icon: '🎭' },
-  { value: 'shopping', label: 'Shopping', icon: '🛍️' },
-  { value: 'other', label: 'Other', icon: '📦' },
+  { value: 'transport', label: 'Transport', icon: '>' },
+  { value: 'accommodation', label: 'Accommodation', icon: '~' },
+  { value: 'food', label: 'Food & Drinks', icon: '+' },
+  { value: 'activities', label: 'Activities', icon: '*' },
+  { value: 'shopping', label: 'Shopping', icon: '#' },
+  { value: 'other', label: 'Other', icon: '-' },
 ]
 
 interface ExpenseFormProps {
@@ -74,19 +74,19 @@ export function ExpenseForm({ tripId, onSuccess, onCancel }: ExpenseFormProps) {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6">
-      <h3 className="text-lg font-bold text-gray-900 mb-4">Add Expense</h3>
+    <div>
+      <h3 className="font-display text-lg text-stone-900 mb-4">Add Expense</h3>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
             {error}
           </div>
         )}
 
         {/* Category Selection */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="font-meta text-stone-500 block mb-2">
             Category *
           </label>
           <div className="grid grid-cols-3 gap-2">
@@ -95,14 +95,14 @@ export function ExpenseForm({ tripId, onSuccess, onCancel }: ExpenseFormProps) {
                 key={cat.value}
                 type="button"
                 onClick={() => setCategory(cat.value)}
-                className={`p-3 rounded-xl border-2 transition-all text-center ${
+                className={`p-3 rounded-lg border-2 transition-all text-center ${
                   category === cat.value
-                    ? 'border-emerald-500 bg-emerald-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-[#1e40af] bg-[#1e40af]/10'
+                    : 'border-stone-200 hover:border-stone-300'
                 }`}
               >
-                <span className="text-2xl block mb-1">{cat.icon}</span>
-                <span className="text-xs font-medium text-gray-700">{cat.label}</span>
+                <span className="text-lg font-mono text-[#4d7c0f] block mb-1">{cat.icon}</span>
+                <span className="text-xs font-medium text-stone-700">{cat.label}</span>
               </button>
             ))}
           </div>
@@ -110,7 +110,7 @@ export function ExpenseForm({ tripId, onSuccess, onCancel }: ExpenseFormProps) {
 
         {/* Description */}
         <div>
-          <label htmlFor="description" className="block text-sm font-semibold text-gray-700 mb-2">
+          <label htmlFor="description" className="font-meta text-stone-500 block mb-2">
             Description *
           </label>
           <input
@@ -120,14 +120,14 @@ export function ExpenseForm({ tripId, onSuccess, onCancel }: ExpenseFormProps) {
             onChange={(e) => setDescription(e.target.value)}
             placeholder="e.g., Taxi to airport, Hotel booking"
             required
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900 placeholder-gray-400"
+            className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af] outline-none transition-all text-stone-900 placeholder-stone-400"
           />
         </div>
 
         {/* Amount and Currency */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="amount" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="amount" className="font-meta text-stone-500 block mb-2">
               Amount *
             </label>
             <input
@@ -139,18 +139,18 @@ export function ExpenseForm({ tripId, onSuccess, onCancel }: ExpenseFormProps) {
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900 placeholder-gray-400"
+              className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af] outline-none transition-all text-stone-900 placeholder-stone-400"
             />
           </div>
           <div>
-            <label htmlFor="currency" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="currency" className="font-meta text-stone-500 block mb-2">
               Currency
             </label>
             <select
               id="currency"
               value={currency}
               onChange={(e) => setCurrency(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900 bg-white"
+              className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af] outline-none transition-all text-stone-900 bg-white"
             >
               <option value="USD">USD ($)</option>
               <option value="TWD">TWD (NT$)</option>
@@ -169,7 +169,7 @@ export function ExpenseForm({ tripId, onSuccess, onCancel }: ExpenseFormProps) {
         {/* Date and Paid By */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="date" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="date" className="font-meta text-stone-500 block mb-2">
               Date *
             </label>
             <input
@@ -178,11 +178,11 @@ export function ExpenseForm({ tripId, onSuccess, onCancel }: ExpenseFormProps) {
               value={date}
               onChange={(e) => setDate(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900"
+              className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af] outline-none transition-all text-stone-900"
             />
           </div>
           <div>
-            <label htmlFor="paidBy" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="paidBy" className="font-meta text-stone-500 block mb-2">
               Paid By
             </label>
             <input
@@ -191,14 +191,14 @@ export function ExpenseForm({ tripId, onSuccess, onCancel }: ExpenseFormProps) {
               value={paidBy}
               onChange={(e) => setPaidBy(e.target.value)}
               placeholder="e.g., John"
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900 placeholder-gray-400"
+              className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af] outline-none transition-all text-stone-900 placeholder-stone-400"
             />
           </div>
         </div>
 
         {/* Notes */}
         <div>
-          <label htmlFor="notes" className="block text-sm font-semibold text-gray-700 mb-2">
+          <label htmlFor="notes" className="font-meta text-stone-500 block mb-2">
             Notes
           </label>
           <textarea
@@ -207,7 +207,7 @@ export function ExpenseForm({ tripId, onSuccess, onCancel }: ExpenseFormProps) {
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Any additional details..."
             rows={2}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900 placeholder-gray-400 resize-none"
+            className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af] outline-none transition-all text-stone-900 placeholder-stone-400 resize-none"
           />
         </div>
 
@@ -216,14 +216,14 @@ export function ExpenseForm({ tripId, onSuccess, onCancel }: ExpenseFormProps) {
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
+            className="flex-1 px-4 py-3 border border-stone-200 text-stone-700 rounded-lg font-medium hover:bg-stone-50 transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 bg-emerald-500 text-white py-3 rounded-xl font-semibold hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 bg-[#1e40af] text-white py-3 rounded-lg font-medium hover:bg-[#1e3a8a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">

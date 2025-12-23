@@ -58,8 +58,9 @@ export default async function DashboardPage() {
 
         {hasTrips ? (
           <section>
-            {/* Stats Bar */}
-            <div className="flex items-center gap-8 mb-8 text-sm">
+            {/* Stats Bar with Action */}
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-8 text-sm">
               <div className="text-center">
                 <p className="font-display text-2xl text-stone-900">{trips.length}</p>
                 <p className="font-meta text-stone-400">Journeys</p>
@@ -84,6 +85,17 @@ export default async function DashboardPage() {
                 </p>
                 <p className="font-meta text-stone-400">Destinations</p>
               </div>
+              </div>
+
+              <Link
+                href="/trips/new"
+                className="flex items-center gap-2 px-5 py-2.5 bg-[#1e40af] text-white rounded-lg font-medium hover:bg-[#1e3a8a] transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                Plan Your Trip
+              </Link>
             </div>
 
             {/* Trips Grid */}

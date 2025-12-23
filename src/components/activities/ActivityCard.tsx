@@ -20,35 +20,35 @@ export function ActivityCard({ activity, onDelete, destinationName }: ActivityCa
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-3 hover:shadow-sm transition-shadow ml-2">
+    <div className="bg-white rounded-lg border border-stone-100 p-3 hover:shadow-sm transition-shadow ml-2">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 flex-wrap">
             {activity.time && (
-              <span className="text-emerald-600 font-medium text-sm">
+              <span className="text-[#1e40af] font-medium text-sm">
                 {formatTime(activity.time)}
               </span>
             )}
-            <span className="font-medium text-gray-900">{activity.name}</span>
+            <span className="font-medium text-stone-900">{activity.name}</span>
             {destinationName && (
-              <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
+              <span className="text-xs bg-[#4d7c0f]/10 text-[#4d7c0f] px-2 py-0.5 rounded-lg font-meta">
                 {destinationName}
               </span>
             )}
           </div>
           {activity.location && (
-            <p className="text-gray-500 text-sm mt-1 flex items-center gap-1">
-              <span>📍</span> {activity.location}
+            <p className="text-stone-500 text-sm mt-1 flex items-center gap-1">
+              <span className="text-[#4d7c0f]">*</span> {activity.location}
             </p>
           )}
           {activity.notes && (
-            <p className="text-gray-600 text-sm mt-1">{activity.notes}</p>
+            <p className="text-stone-500 text-sm mt-1">{activity.notes}</p>
           )}
         </div>
         {onDelete && (
           <button
             onClick={() => onDelete(activity.id)}
-            className="text-gray-400 hover:text-red-500 transition-colors p-1 ml-2"
+            className="text-stone-400 hover:text-red-500 transition-colors p-1 ml-2"
             title="Delete activity"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -18,7 +18,7 @@ interface TripMapProps {
   height?: string
 }
 
-// Create custom icons
+// Create custom icons with editorial colors
 const createIcon = (isHighlighted: boolean) => {
   return L.divIcon({
     className: 'custom-marker',
@@ -26,7 +26,7 @@ const createIcon = (isHighlighted: boolean) => {
       <div style="
         width: ${isHighlighted ? '32px' : '24px'};
         height: ${isHighlighted ? '32px' : '24px'};
-        background: ${isHighlighted ? '#059669' : '#10b981'};
+        background: ${isHighlighted ? '#1e3a8a' : '#1e40af'};
         border: 3px solid white;
         border-radius: 50%;
         box-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -107,7 +107,7 @@ export function TripMap({ destinations, highlightedId, height = '300px' }: TripM
         if (destinations.length > 1) {
           const latlngs = destinations.map((d) => [d.latitude, d.longitude] as [number, number])
           L.polyline(latlngs, {
-            color: '#10b981',
+            color: '#1e40af',
             weight: 2,
             opacity: 0.6,
             dashArray: '5, 10',
@@ -167,10 +167,10 @@ export function TripMap({ destinations, highlightedId, height = '300px' }: TripM
   if (destinations.length === 0) {
     return (
       <div
-        className="bg-gray-100 rounded-xl flex items-center justify-center"
+        className="bg-stone-100 rounded-lg flex items-center justify-center"
         style={{ height }}
       >
-        <p className="text-gray-500">Add destinations to see them on the map</p>
+        <p className="text-stone-500">Add destinations to see them on the map</p>
       </div>
     )
   }
@@ -179,7 +179,7 @@ export function TripMap({ destinations, highlightedId, height = '300px' }: TripM
     <div
       key={mapId}
       ref={containerRef}
-      className="rounded-xl overflow-hidden w-full"
+      className="rounded-lg overflow-hidden w-full"
       style={{ height }}
     />
   )

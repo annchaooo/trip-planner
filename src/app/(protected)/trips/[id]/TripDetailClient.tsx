@@ -10,7 +10,7 @@ import { DestinationCard } from '@/components/destinations/DestinationCard'
 const TripMap = dynamic(() => import('@/components/map/TripMap').then(mod => mod.TripMap), {
   ssr: false,
   loading: () => (
-    <div className="bg-stone-100 rounded-xl h-[400px] flex items-center justify-center">
+    <div className="bg-stone-100 rounded-lg h-[400px] flex items-center justify-center">
       <p className="text-stone-500">Loading map...</p>
     </div>
   ),
@@ -90,7 +90,7 @@ export function TripDetailClient({ trip }: TripDetailClientProps) {
       </div>
 
       {showAddForm && (
-        <div className="mb-6 p-6 bg-stone-50 rounded-xl">
+        <div className="mb-6 p-6 bg-stone-50 rounded-lg">
           <DestinationForm
             tripId={trip.id}
             onSuccess={handleAddSuccess}

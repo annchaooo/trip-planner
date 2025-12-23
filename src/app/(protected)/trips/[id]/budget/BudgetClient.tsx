@@ -133,15 +133,14 @@ export function BudgetClient({ trip, initialExpenses }: BudgetClientProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Left: Summary */}
-      <div className="lg:col-span-1 space-y-6">
-        {/* Budget Overview */}
-        <div className="editorial-card p-6">
-          <h2 className="font-display text-lg text-stone-900 mb-4">Budget Overview</h2>
+    <div className="space-y-6">
+      {/* Row 1: Budget Overview */}
+      <div className="editorial-card p-6">
+        <h2 className="font-display text-lg text-stone-900 mb-4">Budget Overview</h2>
 
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Total Spent */}
-          <div className="mb-6">
+          <div>
             <div className="flex items-end justify-between mb-2">
               <span className="text-stone-500">Total Spent</span>
               <div className="text-right">
@@ -180,48 +179,71 @@ export function BudgetClient({ trip, initialExpenses }: BudgetClientProps) {
             )}
           </div>
 
-          {/* Expense Count */}
-          <div className="pt-4 border-t border-stone-100">
-            <div className="flex justify-between items-center">
-              <span className="text-stone-500">Expenses</span>
-              <span className="font-display text-stone-900">{expenses.length}</span>
+          {/* Quick Stats */}
+          <div className="flex items-center justify-center gap-8">
+            <div className="text-center">
+              <p className="font-display text-2xl text-stone-900">{expenses.length}</p>
+              <p className="text-stone-500 text-sm">Expenses</p>
+            </div>
+            <div className="text-center">
+              <p className="font-display text-2xl text-stone-900">{Object.keys(expensesByCategory).length}</p>
+              <p className="text-stone-500 text-sm">Categories</p>
+            </div>
+            <div className="text-center">
+              <p className="font-display text-2xl text-stone-900">{Object.keys(expensesByDate).length}</p>
+              <p className="text-stone-500 text-sm">Days</p>
             </div>
           </div>
+
+          {/* By Currency (if multiple) */}
+          {Object.keys(expensesByCurrency).length > 1 ? (
+            <div>
+              <p className="text-stone-500 text-sm mb-2">By Currency</p>
+              <div className="space-y-1">
+                {Object.entries(expensesByCurrency).map(([currency, data]) => {
+                  const convertedAmount = convertCurrency(data.total, currency, budgetCurrency)
+                  return (
+                    <div key={currency} className="flex items-center justify-between text-sm">
+                      <span className="font-medium text-stone-900">{formatCurrency(data.total, currency)}</span>
+                      <span className="text-stone-400">= {formatCurrency(convertedAmount, budgetCurrency)}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center">
+              <div className="text-center">
+                <p className="font-display text-2xl text-stone-900">
+                  {expenses.length > 0
+                    ? formatCurrency(totalSpentInBudgetCurrency / expenses.length, budgetCurrency)
+                    : formatCurrency(0, budgetCurrency)}
+                </p>
+                <p className="text-stone-500 text-sm">Avg per expense</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Row 2: By Category - Stacked Bar Chart */}
+      <div className="editorial-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-display text-lg text-stone-900">By Category</h2>
+          {filterCategory && (
+            <button
+              onClick={() => setFilterCategory(null)}
+              className="text-sm text-[#1e40af] hover:text-[#1e3a8a] font-medium"
+            >
+              Clear filter
+            </button>
+          )}
         </div>
 
-        {/* Spending by Currency */}
-        {Object.keys(expensesByCurrency).length > 1 && (
-          <div className="editorial-card p-6">
-            <h2 className="font-display text-lg text-stone-900 mb-4">By Currency</h2>
-            <div className="space-y-2">
-              {Object.entries(expensesByCurrency).map(([currency, data]) => {
-                const info = CURRENCY_INFO[currency] || { symbol: currency, name: currency }
-                const convertedAmount = convertCurrency(data.total, currency, budgetCurrency)
-                return (
-                  <div key={currency} className="flex items-center justify-between p-3 bg-stone-50 rounded-lg">
-                    <div>
-                      <span className="font-medium text-stone-900">{formatCurrency(data.total, currency)}</span>
-                      <span className="text-xs text-stone-400 ml-2">({data.count} items)</span>
-                    </div>
-                    <span className="text-sm text-stone-500">
-                      = {formatCurrency(convertedAmount, budgetCurrency)}
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
-            <p className="text-xs text-stone-400 mt-3 text-center">
-              Converted to {currencyInfo.name} using approximate rates
-            </p>
-          </div>
-        )}
-
-        {/* By Category */}
-        <div className="editorial-card p-6">
-          <h2 className="font-display text-lg text-stone-900 mb-4">By Category</h2>
-
-          {Object.keys(expensesByCategory).length > 0 ? (
-            <div className="space-y-3">
+        {Object.keys(expensesByCategory).length > 0 ? (
+          <div className="space-y-4">
+            {/* Stacked Bar Chart */}
+            <div className="h-12 rounded-lg overflow-hidden flex">
               {Object.entries(expensesByCategory)
                 .sort((a, b) => b[1] - a[1])
                 .map(([category, amount]) => {
@@ -232,50 +254,54 @@ export function BudgetClient({ trip, initialExpenses }: BudgetClientProps) {
                     <button
                       key={category}
                       onClick={() => setFilterCategory(filterCategory === category ? null : category)}
-                      className={`w-full text-left p-3 rounded-lg transition-all ${
+                      className={`h-full transition-all hover:opacity-80 ${config.color} ${
+                        filterCategory === category ? 'ring-2 ring-offset-1 ring-stone-900' : ''
+                      } ${filterCategory && filterCategory !== category ? 'opacity-40' : ''}`}
+                      style={{ width: `${percent}%` }}
+                      title={`${config.label}: ${formatCurrency(amount, budgetCurrency)} (${percent.toFixed(1)}%)`}
+                    />
+                  )
+                })}
+            </div>
+
+            {/* Category Legend */}
+            <div className="flex flex-wrap gap-4 justify-center">
+              {Object.entries(expensesByCategory)
+                .sort((a, b) => b[1] - a[1])
+                .map(([category, amount]) => {
+                  const config = CATEGORY_CONFIG[category] || CATEGORY_CONFIG.other
+                  const percent = totalSpentInBudgetCurrency > 0 ? (amount / totalSpentInBudgetCurrency) * 100 : 0
+
+                  return (
+                    <button
+                      key={category}
+                      onClick={() => setFilterCategory(filterCategory === category ? null : category)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
                         filterCategory === category
-                          ? 'bg-[#1e40af]/10 border-2 border-[#1e40af]'
-                          : 'hover:bg-stone-50 border-2 border-transparent'
-                      }`}
+                          ? 'bg-stone-100 ring-2 ring-[#1e40af]'
+                          : 'hover:bg-stone-50'
+                      } ${filterCategory && filterCategory !== category ? 'opacity-50' : ''}`}
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-[#4d7c0f]">{config.icon}</span>
-                          <span className="font-medium text-stone-900">{config.label}</span>
-                        </div>
-                        <span className="font-display text-stone-900">
-                          {formatCurrency(amount, budgetCurrency)}
-                        </span>
-                      </div>
-                      <div className="w-full bg-stone-200 rounded-full h-1.5">
-                        <div
-                          className={`h-1.5 rounded-full ${config.color}`}
-                          style={{ width: `${percent}%` }}
-                        />
-                      </div>
-                      <p className="text-xs text-stone-400 mt-1">{percent.toFixed(0)}% of total</p>
+                      <span className={`w-3 h-3 rounded-sm ${config.color}`} />
+                      <span className="font-medium text-stone-900 text-sm">{config.label}</span>
+                      <span className="text-stone-500 text-sm">
+                        {formatCurrency(amount, budgetCurrency)}
+                      </span>
+                      <span className="text-stone-400 text-xs">
+                        ({percent.toFixed(0)}%)
+                      </span>
                     </button>
                   )
                 })}
             </div>
-          ) : (
-            <p className="text-stone-500 text-center py-4">No expenses yet</p>
-          )}
-
-          {filterCategory && (
-            <button
-              onClick={() => setFilterCategory(null)}
-              className="w-full mt-4 text-sm text-[#1e40af] hover:text-[#1e3a8a] font-medium"
-            >
-              Clear filter
-            </button>
-          )}
-        </div>
+          </div>
+        ) : (
+          <p className="text-stone-500 text-center py-4">No expenses yet</p>
+        )}
       </div>
 
-      {/* Right: Expenses List */}
-      <div className="lg:col-span-2">
-        <div className="editorial-card p-6">
+      {/* Row 3: Expenses List */}
+      <div className="editorial-card p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="font-display text-lg text-stone-900">
@@ -301,7 +327,7 @@ export function BudgetClient({ trip, initialExpenses }: BudgetClientProps) {
           </div>
 
           {showAddForm && (
-            <div className="mb-6 p-6 bg-stone-50 rounded-xl">
+            <div className="mb-6 p-6 bg-stone-50 rounded-lg">
               <ExpenseForm
                 tripId={trip.id}
                 onSuccess={handleAddSuccess}
@@ -368,7 +394,6 @@ export function BudgetClient({ trip, initialExpenses }: BudgetClientProps) {
               </div>
             )
           )}
-        </div>
       </div>
     </div>
   )

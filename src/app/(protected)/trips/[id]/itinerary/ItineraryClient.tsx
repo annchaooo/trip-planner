@@ -10,7 +10,7 @@ import { ActivityCard } from '@/components/activities/ActivityCard'
 const TripMap = dynamic(() => import('@/components/map/TripMap').then(mod => mod.TripMap), {
   ssr: false,
   loading: () => (
-    <div className="bg-stone-100 rounded-xl h-[300px] flex items-center justify-center">
+    <div className="bg-stone-100 rounded-lg h-[300px] flex items-center justify-center">
       <p className="text-stone-500">Loading map...</p>
     </div>
   ),
@@ -180,20 +180,27 @@ export function ItineraryClient({ trip }: ItineraryClientProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Left: Map & Destinations */}
-      <div className="lg:col-span-1 space-y-6">
-        {/* Map */}
-        <div className="editorial-card p-4 sticky top-6">
-          <h2 className="font-display text-lg text-stone-900 mb-4">Trip Map</h2>
-          <TripMap
-            destinations={trip.destinations}
-            highlightedId={highlightedDestination}
-          />
+    <div className="space-y-6">
+      {/* Row 1: Map with Destinations */}
+      <div className="editorial-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-display text-lg text-stone-900">Trip Map</h2>
+          <p className="text-sm text-stone-500">{trip.destinations.length} destination{trip.destinations.length !== 1 ? 's' : ''}</p>
+        </div>
 
-          {/* Destination Legend */}
-          <div className="mt-4 space-y-2">
-            <h3 className="font-meta text-stone-500">Destinations</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Map */}
+          <div className="lg:col-span-2">
+            <TripMap
+              destinations={trip.destinations}
+              highlightedId={highlightedDestination}
+              height="300px"
+            />
+          </div>
+
+          {/* Destinations Legend */}
+          <div className="space-y-2">
+            <p className="font-meta text-stone-500 text-sm mb-3">Destinations</p>
             {trip.destinations.map((dest, index) => (
               <button
                 key={dest.id}
@@ -206,104 +213,122 @@ export function ItineraryClient({ trip }: ItineraryClientProps) {
                 className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-left ${
                   selectedDestination === dest.id
                     ? 'bg-[#1e40af]/10 border border-[#1e40af]/30'
-                    : 'hover:bg-stone-50'
+                    : 'hover:bg-stone-50 border border-transparent'
                 }`}
               >
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
                   selectedDestination === dest.id
                     ? 'bg-[#1e40af] text-white'
                     : 'bg-stone-200 text-stone-600'
                 }`}>
                   {index + 1}
                 </div>
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="font-medium text-stone-900">{dest.city}</p>
                   <p className="text-xs text-stone-500">{dest.country}</p>
                 </div>
+                {dest.start_date && dest.end_date && (
+                  <span className="text-xs text-stone-400">
+                    {new Date(dest.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    {' - '}
+                    {new Date(dest.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </span>
+                )}
               </button>
             ))}
+            <p className="text-xs text-stone-400 mt-3 text-center">
+              Click a destination to add activities for it
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Right: Day-by-Day Itinerary */}
-      <div className="lg:col-span-2 space-y-4">
-        {days.map((day, index) => {
-          const { day: dayLabel, date } = formatDayHeader(day, index)
-          const dayActivities = activitiesByDate[day] || []
-          const dayDestination = getDestinationForDay(day, dayActivities)
+      {/* Row 2: Day-by-Day Itinerary */}
+      <div className="editorial-card p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="font-display text-lg text-stone-900">Itinerary</h2>
+          <p className="text-sm text-stone-500">{days.length} day{days.length !== 1 ? 's' : ''}</p>
+        </div>
 
-          return (
-            <div
-              key={day}
-              className="editorial-card overflow-hidden"
-              onMouseEnter={() => dayDestination && setHighlightedDestination(dayDestination.id)}
-              onMouseLeave={() => setHighlightedDestination(null)}
-            >
-              {/* Day Header */}
-              <div className="bg-gradient-to-r from-[#1e40af] to-[#1e3a8a] px-6 py-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-white font-display text-lg">{dayLabel}</h3>
-                    <p className="text-blue-200 text-sm">{date}</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {dayDestination && (
-                      <span className="bg-white/20 text-white px-3 py-1 rounded-lg text-sm flex items-center gap-1">
-                        <span className="text-[#4d7c0f]">*</span> {dayDestination.city}
-                      </span>
-                    )}
-                    <span className="bg-white/20 text-white px-3 py-1 rounded-lg text-sm font-meta">
-                      {dayActivities.length} activit{dayActivities.length === 1 ? 'y' : 'ies'}
-                    </span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {days.map((day, index) => {
+            const { day: dayLabel, date } = formatDayHeader(day, index)
+            const dayActivities = activitiesByDate[day] || []
+            const dayDestination = getDestinationForDay(day, dayActivities)
+
+            return (
+              <div
+                key={day}
+                className="border border-stone-200 rounded-lg overflow-hidden"
+                onMouseEnter={() => dayDestination && setHighlightedDestination(dayDestination.id)}
+                onMouseLeave={() => setHighlightedDestination(null)}
+              >
+                {/* Day Header */}
+                <div className="bg-gradient-to-r from-[#1e40af] to-[#1e3a8a] px-4 py-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-white font-display">{dayLabel}</h3>
+                      <p className="text-blue-200 text-xs">{date}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {dayDestination && (
+                        <span className="bg-white/20 text-white px-2 py-0.5 rounded text-xs flex items-center gap-1">
+                          <span className="text-[#4d7c0f]">*</span> {dayDestination.city}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Activities */}
-              <div className="p-6">
-                {dayActivities.length > 0 && (
-                  <div className="space-y-3 mb-4">
-                    {dayActivities.map((activity) => {
-                      const activityDest = destinationMap[activity.destination_id]
-                      return (
-                        <div key={activity.id} className="relative">
-                          {activityDest && (
-                            <span className="absolute -left-2 top-0 w-1 h-full bg-[#4d7c0f] rounded-full" />
-                          )}
-                          <ActivityCard
-                            activity={activity}
-                            onDelete={handleDeleteActivity}
-                            destinationName={activityDest?.city}
-                          />
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
+                {/* Activities */}
+                <div className="p-4">
+                  {dayActivities.length > 0 && (
+                    <div className="space-y-2 mb-3">
+                      {dayActivities.map((activity) => {
+                        const activityDest = destinationMap[activity.destination_id]
+                        return (
+                          <div key={activity.id} className="relative">
+                            {activityDest && (
+                              <span className="absolute -left-1 top-0 w-0.5 h-full bg-[#4d7c0f] rounded-full" />
+                            )}
+                            <ActivityCard
+                              activity={activity}
+                              onDelete={handleDeleteActivity}
+                              destinationName={activityDest?.city}
+                            />
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
 
-                {addingActivityForDay === day && selectedDestination ? (
-                  <div className="p-4 bg-stone-50 rounded-xl">
-                    <ActivityForm
-                      destinationId={selectedDestination}
-                      date={day}
-                      destinationCity={destinationMap[selectedDestination]?.city}
-                      onSuccess={handleAddSuccess}
-                      onCancel={() => setAddingActivityForDay(null)}
-                    />
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setAddingActivityForDay(day)}
-                    className="w-full py-3 border-2 border-dashed border-stone-200 rounded-lg text-stone-500 hover:border-[#1e40af] hover:text-[#1e40af] transition-colors font-medium"
-                  >
-                    + Add Activity to {dayLabel}
-                  </button>
-                )}
+                  {dayActivities.length === 0 && !addingActivityForDay && (
+                    <p className="text-stone-400 text-sm text-center py-2">No activities planned</p>
+                  )}
+
+                  {addingActivityForDay === day && selectedDestination ? (
+                    <div className="p-3 bg-stone-50 rounded-lg">
+                      <ActivityForm
+                        destinationId={selectedDestination}
+                        date={day}
+                        destinationCity={destinationMap[selectedDestination]?.city}
+                        onSuccess={handleAddSuccess}
+                        onCancel={() => setAddingActivityForDay(null)}
+                      />
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setAddingActivityForDay(day)}
+                      className="w-full py-2 border border-dashed border-stone-200 rounded-lg text-stone-500 hover:border-[#1e40af] hover:text-[#1e40af] transition-colors text-sm font-medium"
+                    >
+                      + Add Activity
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })}
+        </div>
       </div>
     </div>
   )

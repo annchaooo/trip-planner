@@ -30,17 +30,26 @@ export default async function ArticlesPage() {
     redirect('/login')
   }
 
-  // Fetch all notes across all trips
-  const { data: notes } = await supabase
-    .from('notes')
-    .select(`
-      *,
-      trips (id, name),
-      destinations (city, country)
-    `)
-    .eq('trips.user_id', user.id)
-    .order('date', { ascending: false })
-    .order('created_at', { ascending: false })
+  // First get user's trip IDs
+  const { data: userTrips } = await supabase
+    .from('trips')
+    .select('id')
+    .eq('user_id', user.id)
+
+  const tripIds = (userTrips || []).map(t => t.id)
+
+  // Fetch all notes for user's trips
+  const { data: notes } = tripIds.length > 0
+    ? await supabase
+        .from('notes')
+        .select(`
+          *,
+          trips (id, name),
+          destinations (city, country)
+        `)
+        .in('trip_id', tripIds)
+        .order('date', { ascending: false })
+    : { data: [] }
 
   const allNotes = (notes || []) as Note[]
   const essays = allNotes.filter(n => n.type === 'essay')

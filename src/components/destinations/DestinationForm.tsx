@@ -69,19 +69,19 @@ export function DestinationForm({ tripId, onSuccess, onCancel }: DestinationForm
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6">
-      <h3 className="text-lg font-bold text-gray-900 mb-4">Add Destination</h3>
+    <div>
+      <h3 className="font-display text-lg text-stone-900 mb-4">Add Destination</h3>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
             {error}
           </div>
         )}
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="city" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="city" className="font-meta text-stone-500 block mb-2">
               City *
             </label>
             <input
@@ -94,12 +94,12 @@ export function DestinationForm({ tripId, onSuccess, onCancel }: DestinationForm
               }}
               placeholder="e.g., Tokyo, Paris, New York"
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900 placeholder-gray-400"
+              className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af] outline-none transition-all text-stone-900 placeholder-stone-400"
             />
           </div>
 
           <div>
-            <label htmlFor="country" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="country" className="font-meta text-stone-500 block mb-2">
               Country *
             </label>
             <input
@@ -112,13 +112,13 @@ export function DestinationForm({ tripId, onSuccess, onCancel }: DestinationForm
               }}
               placeholder="e.g., Japan, France, USA"
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900 placeholder-gray-400"
+              className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af] outline-none transition-all text-stone-900 placeholder-stone-400"
             />
           </div>
         </div>
 
         {geocodingStatus === 'success' && (
-          <div className="flex items-center gap-2 text-emerald-600 text-sm">
+          <div className="flex items-center gap-2 text-[#4d7c0f] text-sm">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
@@ -128,7 +128,7 @@ export function DestinationForm({ tripId, onSuccess, onCancel }: DestinationForm
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="startDate" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="startDate" className="font-meta text-stone-500 block mb-2">
               Start Date (optional)
             </label>
             <input
@@ -136,12 +136,12 @@ export function DestinationForm({ tripId, onSuccess, onCancel }: DestinationForm
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900"
+              className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af] outline-none transition-all text-stone-900"
             />
           </div>
 
           <div>
-            <label htmlFor="endDate" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="endDate" className="font-meta text-stone-500 block mb-2">
               End Date (optional)
             </label>
             <input
@@ -150,7 +150,7 @@ export function DestinationForm({ tripId, onSuccess, onCancel }: DestinationForm
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               min={startDate}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900"
+              className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af] outline-none transition-all text-stone-900"
             />
           </div>
         </div>
@@ -159,14 +159,14 @@ export function DestinationForm({ tripId, onSuccess, onCancel }: DestinationForm
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
+            className="flex-1 px-4 py-3 border border-stone-200 text-stone-700 rounded-lg font-medium hover:bg-stone-50 transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 bg-emerald-500 text-white py-3 rounded-xl font-semibold hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 bg-[#1e40af] text-white py-3 rounded-lg font-medium hover:bg-[#1e3a8a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">

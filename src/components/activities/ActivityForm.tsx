@@ -90,7 +90,7 @@ export function ActivityForm({ destinationId, date, destinationCity, onSuccess, 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-gray-50 rounded-xl p-4 space-y-3">
+    <form onSubmit={handleSubmit} className="space-y-3">
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-sm">
           {error}
@@ -104,7 +104,7 @@ export function ActivityForm({ destinationId, date, destinationCity, onSuccess, 
           onChange={(e) => setName(e.target.value)}
           placeholder="Activity name (e.g., Visit Eiffel Tower) *"
           required
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900 placeholder-gray-400 text-sm"
+          className="w-full px-3 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af] outline-none transition-all text-stone-900 placeholder-stone-400 text-sm"
         />
       </div>
 
@@ -114,7 +114,7 @@ export function ActivityForm({ destinationId, date, destinationCity, onSuccess, 
             type="time"
             value={time}
             onChange={(e) => setTime(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900 text-sm"
+            className="w-full px-3 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af] outline-none transition-all text-stone-900 text-sm"
             placeholder="Time"
           />
         </div>
@@ -127,10 +127,10 @@ export function ActivityForm({ destinationId, date, destinationCity, onSuccess, 
               setLocationStatus('idle')
             }}
             placeholder="Location/Attraction"
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900 placeholder-gray-400 text-sm"
+            className="w-full px-3 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af] outline-none transition-all text-stone-900 placeholder-stone-400 text-sm"
           />
           {locationStatus === 'found' && (
-            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-emerald-500">
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[#4d7c0f]">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
@@ -140,14 +140,14 @@ export function ActivityForm({ destinationId, date, destinationCity, onSuccess, 
       </div>
 
       {locationStatus === 'found' && (
-        <p className="text-xs text-emerald-600 flex items-center gap-1">
-          <span>📍</span> Location will be shown on map
+        <p className="text-xs text-[#4d7c0f] flex items-center gap-1">
+          <span>*</span> Location will be shown on map
         </p>
       )}
 
       {locationStatus === 'not_found' && location.trim() && (
         <p className="text-xs text-amber-600 flex items-center gap-1">
-          <span>⚠️</span> Location not found on map, but will be saved as text
+          <span>!</span> Location not found on map, but will be saved as text
         </p>
       )}
 
@@ -157,7 +157,7 @@ export function ActivityForm({ destinationId, date, destinationCity, onSuccess, 
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Notes (optional)"
           rows={2}
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900 placeholder-gray-400 text-sm resize-none"
+          className="w-full px-3 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af] outline-none transition-all text-stone-900 placeholder-stone-400 text-sm resize-none"
         />
       </div>
 
@@ -165,14 +165,14 @@ export function ActivityForm({ destinationId, date, destinationCity, onSuccess, 
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 px-3 py-2 text-sm border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+          className="flex-1 px-3 py-2 text-sm border border-stone-200 text-stone-700 rounded-lg font-medium hover:bg-stone-50 transition-colors"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 bg-emerald-500 text-white px-3 py-2 text-sm rounded-lg font-medium hover:bg-emerald-600 transition-colors disabled:opacity-50"
+          className="flex-1 bg-[#1e40af] text-white px-3 py-2 text-sm rounded-lg font-medium hover:bg-[#1e3a8a] transition-colors disabled:opacity-50"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-1">
