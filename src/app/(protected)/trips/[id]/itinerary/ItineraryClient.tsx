@@ -10,8 +10,8 @@ import { ActivityCard } from '@/components/activities/ActivityCard'
 const TripMap = dynamic(() => import('@/components/map/TripMap').then(mod => mod.TripMap), {
   ssr: false,
   loading: () => (
-    <div className="bg-gray-100 rounded-xl h-[300px] flex items-center justify-center">
-      <p className="text-gray-500">Loading map...</p>
+    <div className="bg-stone-100 rounded-xl h-[300px] flex items-center justify-center">
+      <p className="text-stone-500">Loading map...</p>
     </div>
   ),
 })
@@ -158,15 +158,20 @@ export function ItineraryClient({ trip }: ItineraryClientProps) {
 
   if (trip.destinations.length === 0) {
     return (
-      <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-        <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <span className="text-3xl">📍</span>
+      <div className="editorial-card p-12 text-center">
+        <div className="w-20 h-20 mx-auto mb-6 relative">
+          <svg viewBox="0 0 80 80" fill="none" className="w-full h-full">
+            <circle cx="40" cy="40" r="36" stroke="#e7e5e4" strokeWidth="1.5" />
+            <circle cx="40" cy="32" r="8" stroke="#1e40af" strokeWidth="1.5" />
+            <path d="M40 44 L40 52" stroke="#1e40af" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M32 56 C32 52 48 52 48 56" stroke="#4d7c0f" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
         </div>
-        <h3 className="text-lg font-bold text-gray-900 mb-2">No destinations yet</h3>
-        <p className="text-gray-600 mb-4">Add destinations to your trip first</p>
+        <h3 className="font-display text-lg text-stone-900 mb-2">No destinations yet</h3>
+        <p className="text-stone-500 mb-6">Add destinations to your trip first</p>
         <a
           href={`/trips/${trip.id}`}
-          className="inline-block bg-emerald-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-emerald-600 transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-[#1e40af] text-white rounded-lg font-medium hover:bg-[#1e3a8a] transition-colors"
         >
           Add Destinations
         </a>
@@ -179,8 +184,8 @@ export function ItineraryClient({ trip }: ItineraryClientProps) {
       {/* Left: Map & Destinations */}
       <div className="lg:col-span-1 space-y-6">
         {/* Map */}
-        <div className="bg-white rounded-2xl shadow-lg p-4 sticky top-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Trip Map</h2>
+        <div className="editorial-card p-4 sticky top-6">
+          <h2 className="font-display text-lg text-stone-900 mb-4">Trip Map</h2>
           <TripMap
             destinations={trip.destinations}
             highlightedId={highlightedDestination}
@@ -188,7 +193,7 @@ export function ItineraryClient({ trip }: ItineraryClientProps) {
 
           {/* Destination Legend */}
           <div className="mt-4 space-y-2">
-            <h3 className="text-sm font-semibold text-gray-700">Destinations</h3>
+            <h3 className="font-meta text-stone-500">Destinations</h3>
             {trip.destinations.map((dest, index) => (
               <button
                 key={dest.id}
@@ -198,22 +203,22 @@ export function ItineraryClient({ trip }: ItineraryClientProps) {
                 }}
                 onMouseEnter={() => setHighlightedDestination(dest.id)}
                 onMouseLeave={() => setHighlightedDestination(null)}
-                className={`w-full flex items-center gap-3 p-2 rounded-lg transition-colors text-left ${
+                className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors text-left ${
                   selectedDestination === dest.id
-                    ? 'bg-emerald-50 border border-emerald-200'
-                    : 'hover:bg-gray-50'
+                    ? 'bg-[#1e40af]/10 border border-[#1e40af]/30'
+                    : 'hover:bg-stone-50'
                 }`}
               >
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                   selectedDestination === dest.id
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-gray-200 text-gray-600'
+                    ? 'bg-[#1e40af] text-white'
+                    : 'bg-stone-200 text-stone-600'
                 }`}>
                   {index + 1}
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">{dest.city}</p>
-                  <p className="text-xs text-gray-500">{dest.country}</p>
+                  <p className="font-medium text-stone-900">{dest.city}</p>
+                  <p className="text-xs text-stone-500">{dest.country}</p>
                 </div>
               </button>
             ))}
@@ -231,24 +236,24 @@ export function ItineraryClient({ trip }: ItineraryClientProps) {
           return (
             <div
               key={day}
-              className="bg-white rounded-2xl shadow-lg overflow-hidden"
+              className="editorial-card overflow-hidden"
               onMouseEnter={() => dayDestination && setHighlightedDestination(dayDestination.id)}
               onMouseLeave={() => setHighlightedDestination(null)}
             >
               {/* Day Header */}
-              <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-4">
+              <div className="bg-gradient-to-r from-[#1e40af] to-[#1e3a8a] px-6 py-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-white font-bold text-lg">{dayLabel}</h3>
-                    <p className="text-emerald-100 text-sm">{date}</p>
+                    <h3 className="text-white font-display text-lg">{dayLabel}</h3>
+                    <p className="text-blue-200 text-sm">{date}</p>
                   </div>
                   <div className="flex items-center gap-3">
                     {dayDestination && (
-                      <span className="bg-white/20 text-white px-3 py-1 rounded-full text-sm flex items-center gap-1">
-                        <span>📍</span> {dayDestination.city}
+                      <span className="bg-white/20 text-white px-3 py-1 rounded-lg text-sm flex items-center gap-1">
+                        <span className="text-[#4d7c0f]">*</span> {dayDestination.city}
                       </span>
                     )}
-                    <span className="bg-white/20 text-white px-3 py-1 rounded-full text-sm">
+                    <span className="bg-white/20 text-white px-3 py-1 rounded-lg text-sm font-meta">
                       {dayActivities.length} activit{dayActivities.length === 1 ? 'y' : 'ies'}
                     </span>
                   </div>
@@ -264,7 +269,7 @@ export function ItineraryClient({ trip }: ItineraryClientProps) {
                       return (
                         <div key={activity.id} className="relative">
                           {activityDest && (
-                            <span className="absolute -left-2 top-0 w-1 h-full bg-emerald-300 rounded-full" />
+                            <span className="absolute -left-2 top-0 w-1 h-full bg-[#4d7c0f] rounded-full" />
                           )}
                           <ActivityCard
                             activity={activity}
@@ -278,17 +283,19 @@ export function ItineraryClient({ trip }: ItineraryClientProps) {
                 )}
 
                 {addingActivityForDay === day && selectedDestination ? (
-                  <ActivityForm
-                    destinationId={selectedDestination}
-                    date={day}
-                    destinationCity={destinationMap[selectedDestination]?.city}
-                    onSuccess={handleAddSuccess}
-                    onCancel={() => setAddingActivityForDay(null)}
-                  />
+                  <div className="p-4 bg-stone-50 rounded-xl">
+                    <ActivityForm
+                      destinationId={selectedDestination}
+                      date={day}
+                      destinationCity={destinationMap[selectedDestination]?.city}
+                      onSuccess={handleAddSuccess}
+                      onCancel={() => setAddingActivityForDay(null)}
+                    />
+                  </div>
                 ) : (
                   <button
                     onClick={() => setAddingActivityForDay(day)}
-                    className="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 hover:border-emerald-300 hover:text-emerald-600 transition-colors font-medium"
+                    className="w-full py-3 border-2 border-dashed border-stone-200 rounded-lg text-stone-500 hover:border-[#1e40af] hover:text-[#1e40af] transition-colors font-medium"
                   >
                     + Add Activity to {dayLabel}
                   </button>

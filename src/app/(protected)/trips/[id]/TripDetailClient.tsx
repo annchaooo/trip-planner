@@ -10,8 +10,8 @@ import { DestinationCard } from '@/components/destinations/DestinationCard'
 const TripMap = dynamic(() => import('@/components/map/TripMap').then(mod => mod.TripMap), {
   ssr: false,
   loading: () => (
-    <div className="bg-gray-100 rounded-xl h-[400px] flex items-center justify-center">
-      <p className="text-gray-500">Loading map...</p>
+    <div className="bg-stone-100 rounded-xl h-[400px] flex items-center justify-center">
+      <p className="text-stone-500">Loading map...</p>
     </div>
   ),
 })
@@ -68,26 +68,29 @@ export function TripDetailClient({ trip }: TripDetailClientProps) {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8">
+    <div className="editorial-card p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Destinations</h2>
-          <p className="text-gray-600 text-sm mt-1">
+          <h2 className="font-display text-xl text-stone-900">Destinations</h2>
+          <p className="text-stone-500 text-sm mt-1">
             {destinations.length} destination{destinations.length !== 1 ? 's' : ''} planned
           </p>
         </div>
         {!showAddForm && (
           <button
             onClick={() => setShowAddForm(true)}
-            className="bg-emerald-500 text-white px-4 py-2 rounded-xl font-semibold hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/30"
+            className="flex items-center gap-2 px-4 py-2 bg-[#1e40af] text-white rounded-lg font-medium hover:bg-[#1e3a8a] transition-colors"
           >
-            + Add Destination
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Destination
           </button>
         )}
       </div>
 
       {showAddForm && (
-        <div className="mb-6">
+        <div className="mb-6 p-6 bg-stone-50 rounded-xl">
           <DestinationForm
             tripId={trip.id}
             onSuccess={handleAddSuccess}
@@ -104,7 +107,7 @@ export function TripDetailClient({ trip }: TripDetailClientProps) {
           </div>
 
           {/* Destination Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="stories-grid">
             {destinations
               .sort((a, b) => a.order_index - b.order_index)
               .map((destination) => (
@@ -119,15 +122,23 @@ export function TripDetailClient({ trip }: TripDetailClientProps) {
       ) : (
         !showAddForm && (
           <div className="text-center py-12">
-            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">📍</span>
+            <div className="w-20 h-20 mx-auto mb-6 relative">
+              <svg viewBox="0 0 80 80" fill="none" className="w-full h-full">
+                <circle cx="40" cy="40" r="36" stroke="#e7e5e4" strokeWidth="1.5" />
+                <circle cx="40" cy="32" r="8" stroke="#1e40af" strokeWidth="1.5" />
+                <path d="M40 44 L40 52" stroke="#1e40af" strokeWidth="1.5" strokeLinecap="round" />
+                <path d="M32 56 C32 52 48 52 48 56" stroke="#4d7c0f" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
             </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">No destinations yet</h3>
-            <p className="text-gray-600 mb-4">Add your first destination to start planning</p>
+            <h3 className="font-display text-lg text-stone-900 mb-2">No destinations yet</h3>
+            <p className="text-stone-500 mb-6">Add your first destination to start planning</p>
             <button
               onClick={() => setShowAddForm(true)}
-              className="bg-emerald-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/30"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#1e40af] text-white rounded-lg font-medium hover:bg-[#1e3a8a] transition-colors"
             >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
               Add First Destination
             </button>
           </div>

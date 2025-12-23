@@ -2,6 +2,7 @@ import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { BudgetClient } from './BudgetClient'
+import { EditorialLayout } from '@/components/layout/EditorialLayout'
 
 interface Expense {
   id: string
@@ -54,51 +55,40 @@ export default async function BudgetPage({
     .order('date', { ascending: false })
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <nav className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center">
-              <span className="text-white text-xl">✈</span>
-            </div>
-            <span className="text-xl font-bold text-gray-900">WanderNote</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <span className="text-gray-600">{user.email}</span>
-            <form action="/auth/signout" method="post">
-              <button
-                type="submit"
-                className="text-gray-600 font-medium hover:text-gray-900 transition-colors"
-              >
-                Log out
-              </button>
-            </form>
-          </div>
-        </nav>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-6 py-12">
-        <div className="mb-6">
+    <EditorialLayout userEmail={user.email}>
+      <div className="content-well px-6 lg:px-8 py-12 lg:py-16">
+        {/* Breadcrumb */}
+        <div className="mb-8">
           <Link
             href={`/trips/${trip.id}`}
-            className="text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1"
+            className="text-[#1e40af] hover:text-[#1e3a8a] font-medium flex items-center gap-1"
           >
-            <span>←</span> Back to Trip
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to {trip.name}
           </Link>
         </div>
 
-        {/* Page Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Budget & Expenses</h1>
-            <p className="text-gray-600 mt-1">{trip.name}</p>
+        {/* Header */}
+        <header className="mb-12">
+          <div className="rule-line mb-8" />
+
+          <div className="text-center">
+            <p className="font-meta text-[#4d7c0f] mb-2">{trip.name}</p>
+            <h1 className="font-display text-4xl md:text-5xl text-stone-900 mb-4">
+              Budget & Expenses
+            </h1>
+            <p className="text-stone-500 max-w-md mx-auto">
+              Track your spending and stay within budget.
+            </p>
           </div>
-        </div>
+
+          <div className="rule-line mt-8" />
+        </header>
 
         <BudgetClient trip={trip as Trip} initialExpenses={(expenses || []) as Expense[]} />
-      </main>
-    </div>
+      </div>
+    </EditorialLayout>
   )
 }

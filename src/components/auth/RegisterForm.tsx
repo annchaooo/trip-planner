@@ -60,13 +60,13 @@ export function RegisterForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
           {error}
         </div>
       )}
 
       <div>
-        <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+        <label htmlFor="email" className="font-meta text-stone-500 block mb-2">
           Email
         </label>
         <input
@@ -76,12 +76,12 @@ export function RegisterForm() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
           required
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900 placeholder-gray-400"
+          className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af] outline-none transition-all text-stone-900 placeholder-stone-400"
         />
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+        <label htmlFor="password" className="font-meta text-stone-500 block mb-2">
           Password
         </label>
         <input
@@ -91,12 +91,12 @@ export function RegisterForm() {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="At least 8 characters"
           required
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900 placeholder-gray-400"
+          className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af] outline-none transition-all text-stone-900 placeholder-stone-400"
         />
       </div>
 
       <div>
-        <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
+        <label htmlFor="confirmPassword" className="font-meta text-stone-500 block mb-2">
           Confirm Password
         </label>
         <input
@@ -106,14 +106,14 @@ export function RegisterForm() {
           onChange={(e) => setConfirmPassword(e.target.value)}
           placeholder="Confirm your password"
           required
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-gray-900 placeholder-gray-400"
+          className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:ring-2 focus:ring-[#1e40af]/20 focus:border-[#1e40af] outline-none transition-all text-stone-900 placeholder-stone-400"
         />
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-emerald-500 text-white py-3 rounded-xl font-semibold hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-[#1e40af] text-white py-3 rounded-lg font-semibold hover:bg-[#1e3a8a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">
@@ -125,9 +125,11 @@ export function RegisterForm() {
         )}
       </button>
 
-      <p className="text-center text-gray-600">
+      <div className="rule-line my-6" />
+
+      <p className="text-center text-stone-500">
         Already have an account?{' '}
-        <Link href="/login" className="text-emerald-600 font-semibold hover:text-emerald-700">
+        <Link href="/login" className="text-[#1e40af] font-semibold hover:text-[#1e3a8a]">
           Log in
         </Link>
       </p>

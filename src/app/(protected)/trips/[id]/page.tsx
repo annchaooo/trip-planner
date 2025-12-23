@@ -2,6 +2,7 @@ import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { TripDetailClient } from './TripDetailClient'
+import { EditorialLayout } from '@/components/layout/EditorialLayout'
 
 interface Destination {
   id: string
@@ -52,8 +53,7 @@ export default async function TripDetailPage({
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
+      month: 'short',
       day: 'numeric',
       year: 'numeric',
     })
@@ -68,89 +68,84 @@ export default async function TripDetailPage({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <nav className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center">
-              <span className="text-white text-xl">✈</span>
-            </div>
-            <span className="text-xl font-bold text-gray-900">WanderNote</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <span className="text-gray-600">{user.email}</span>
-            <form action="/auth/signout" method="post">
-              <button
-                type="submit"
-                className="text-gray-600 font-medium hover:text-gray-900 transition-colors"
-              >
-                Log out
-              </button>
-            </form>
-          </div>
-        </nav>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-6 py-12">
-        <div className="mb-6">
+    <EditorialLayout userEmail={user.email}>
+      <div className="content-well px-6 lg:px-8 py-12 lg:py-16">
+        {/* Breadcrumb */}
+        <div className="mb-8">
           <Link
             href="/dashboard"
-            className="text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1"
+            className="text-[#1e40af] hover:text-[#1e3a8a] font-medium flex items-center gap-1"
           >
-            <span>←</span> Back to Dashboard
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Journeys
           </Link>
         </div>
 
-        {/* Trip Header */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <div className="flex items-start justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">{trip.name}</h1>
-              <p className="text-gray-600 mt-2">
-                {formatDate(trip.start_date)} - {formatDate(trip.end_date)}
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-sm text-gray-500">Duration</p>
-                <p className="font-semibold text-gray-900">{getDuration()}</p>
-              </div>
-              {trip.budget && (
-                <div className="text-right">
-                  <p className="text-sm text-gray-500">Budget</p>
-                  <p className="font-semibold text-emerald-600">${trip.budget.toLocaleString()}</p>
-                </div>
-              )}
-            </div>
+        {/* Header */}
+        <header className="mb-12">
+          <div className="rule-line mb-8" />
+
+          <div className="text-center">
+            <p className="font-meta text-[#4d7c0f] mb-2">
+              {formatDate(trip.start_date)} - {formatDate(trip.end_date)}
+            </p>
+            <h1 className="font-display text-4xl md:text-5xl text-stone-900 mb-4">
+              {trip.name}
+            </h1>
           </div>
 
-          <div className="flex gap-3 flex-wrap">
-            <Link
-              href={`/trips/${trip.id}/itinerary`}
-              className="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg font-medium hover:bg-emerald-200 transition-colors"
-            >
-              View Itinerary
-            </Link>
-            <Link
-              href={`/trips/${trip.id}/budget`}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
-            >
-              Manage Budget
-            </Link>
-            <Link
-              href={`/trips/${trip.id}/notes`}
-              className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg font-medium hover:bg-purple-200 transition-colors"
-            >
-              Journey Notes
-            </Link>
+          {/* Stats */}
+          <div className="flex items-center justify-center gap-8 mt-8 text-sm">
+            <div className="text-center">
+              <p className="font-display text-2xl text-stone-900">{getDuration()}</p>
+              <p className="font-meta text-stone-400">Duration</p>
+            </div>
+            <div className="w-px h-10 bg-stone-200" />
+            <div className="text-center">
+              <p className="font-display text-2xl text-stone-900">{(trip.destinations || []).length}</p>
+              <p className="font-meta text-stone-400">Destinations</p>
+            </div>
+            {trip.budget && (
+              <>
+                <div className="w-px h-10 bg-stone-200" />
+                <div className="text-center">
+                  <p className="font-display text-2xl text-[#4d7c0f]">${trip.budget.toLocaleString()}</p>
+                  <p className="font-meta text-stone-400">Budget</p>
+                </div>
+              </>
+            )}
           </div>
+
+          <div className="rule-line mt-8" />
+        </header>
+
+        {/* Quick Actions */}
+        <div className="flex flex-wrap gap-3 justify-center mb-12">
+          <Link
+            href={`/trips/${trip.id}/itinerary`}
+            className="px-5 py-2.5 bg-[#1e40af]/10 text-[#1e40af] rounded-lg font-medium hover:bg-[#1e40af]/20 transition-colors"
+          >
+            View Itinerary
+          </Link>
+          <Link
+            href={`/trips/${trip.id}/budget`}
+            className="px-5 py-2.5 bg-[#4d7c0f]/10 text-[#4d7c0f] rounded-lg font-medium hover:bg-[#4d7c0f]/20 transition-colors"
+          >
+            Manage Budget
+          </Link>
+          <Link
+            href={`/trips/${trip.id}/notes`}
+            className="px-5 py-2.5 bg-stone-100 text-stone-700 rounded-lg font-medium hover:bg-stone-200 transition-colors"
+          >
+            Journey Notes
+          </Link>
         </div>
 
         {/* Destinations Section - Client Component */}
         <TripDetailClient trip={trip as Trip} />
-      </main>
-    </div>
+      </div>
+    </EditorialLayout>
   )
 }

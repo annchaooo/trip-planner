@@ -20,13 +20,13 @@ export function DestinationCard({ destination, onDelete }: DestinationCardProps)
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
+    <div className="editorial-card p-4 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between">
         <div>
-          <h4 className="font-bold text-gray-900">{destination.city}</h4>
-          <p className="text-gray-600 text-sm">{destination.country}</p>
+          <h4 className="font-display text-stone-900">{destination.city}</h4>
+          <p className="text-stone-500 text-sm">{destination.country}</p>
           {destination.start_date && destination.end_date && (
-            <p className="text-emerald-600 text-sm mt-1">
+            <p className="text-[#4d7c0f] text-sm mt-1 font-meta">
               {formatDate(destination.start_date)} - {formatDate(destination.end_date)}
             </p>
           )}
@@ -34,7 +34,7 @@ export function DestinationCard({ destination, onDelete }: DestinationCardProps)
         {onDelete && (
           <button
             onClick={() => onDelete(destination.id)}
-            className="text-gray-400 hover:text-red-500 transition-colors p-1"
+            className="text-stone-400 hover:text-red-500 transition-colors p-1"
             title="Delete destination"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

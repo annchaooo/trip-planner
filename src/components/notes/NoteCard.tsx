@@ -3,20 +3,13 @@
 import { useState } from 'react'
 import Image from 'next/image'
 
-const TYPE_CONFIG: Record<string, { icon: string; color: string; bg: string; gradient: string }> = {
-  note: { icon: '📝', color: 'text-blue-600', bg: 'bg-blue-100', gradient: 'from-blue-500 to-blue-600' },
-  essay: { icon: '✍️', color: 'text-purple-600', bg: 'bg-purple-100', gradient: 'from-purple-500 to-pink-500' },
-  highlight: { icon: '⭐', color: 'text-amber-600', bg: 'bg-amber-100', gradient: 'from-amber-500 to-orange-500' },
-  photo: { icon: '📷', color: 'text-pink-600', bg: 'bg-pink-100', gradient: 'from-pink-500 to-rose-500' },
-}
-
-const MOOD_ICONS: Record<string, string> = {
-  happy: '😊',
-  excited: '🤩',
-  peaceful: '😌',
-  adventurous: '🧗',
-  amazed: '😮',
-  tired: '😴',
+const MOOD_LABELS: Record<string, { label: string; icon: string }> = {
+  happy: { label: 'Joyful', icon: '☀' },
+  excited: { label: 'Exhilarated', icon: '✦' },
+  peaceful: { label: 'Serene', icon: '◌' },
+  adventurous: { label: 'Adventurous', icon: '↗' },
+  amazed: { label: 'In Awe', icon: '◇' },
+  tired: { label: 'Weary', icon: '∿' },
 }
 
 interface Note {
@@ -40,119 +33,26 @@ interface NoteCardProps {
 
 export function NoteCard({ note, onDelete, onToggleFavorite }: NoteCardProps) {
   const [expanded, setExpanded] = useState(false)
-  const [showMenu, setShowMenu] = useState(false)
-  const [liked, setLiked] = useState(note.is_favorite)
-  const [likeAnimation, setLikeAnimation] = useState(false)
-  const config = TYPE_CONFIG[note.type] || TYPE_CONFIG.note
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
-    const now = new Date()
-    const diffTime = now.getTime() - date.getTime()
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-
-    if (diffDays === 0) return 'Today'
-    if (diffDays === 1) return 'Yesterday'
-    if (diffDays < 7) return `${diffDays} days ago`
-
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
-    })
-  }
-
-  const handleDoubleTap = () => {
-    if (!liked) {
-      setLiked(true)
-      setLikeAnimation(true)
-      onToggleFavorite(note.id, true)
-      setTimeout(() => setLikeAnimation(false), 1000)
+    return {
+      day: date.getDate(),
+      month: date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
+      year: date.getFullYear(),
     }
   }
 
-  const handleLikeClick = () => {
-    const newLiked = !liked
-    setLiked(newLiked)
-    if (newLiked) {
-      setLikeAnimation(true)
-      setTimeout(() => setLikeAnimation(false), 1000)
-    }
-    onToggleFavorite(note.id, newLiked)
-  }
+  const dateInfo = formatDate(note.date)
+  const shouldTruncate = note.content && note.content.length > 280 && note.type !== 'essay'
+  const moodInfo = note.mood ? MOOD_LABELS[note.mood] : null
 
-  const locationText = [
-    note.destinations?.city,
-    note.location,
-  ].filter(Boolean).join(' • ')
-
-  const shouldTruncate = note.content && note.content.length > 150
-
-  return (
-    <article className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-      {/* Header - Instagram style */}
-      <div className="flex items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-3">
-          {/* Type Avatar */}
-          <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${config.gradient} flex items-center justify-center`}>
-            <span className="text-lg">{config.icon}</span>
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-gray-900 text-sm">{note.title}</span>
-              {note.mood && (
-                <span className="text-sm">{MOOD_ICONS[note.mood]}</span>
-              )}
-            </div>
-            {locationText && (
-              <p className="text-xs text-gray-500 flex items-center gap-1">
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                </svg>
-                {locationText}
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Menu */}
-        <div className="relative">
-          <button
-            onClick={() => setShowMenu(!showMenu)}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
-              <circle cx="12" cy="6" r="2"/>
-              <circle cx="12" cy="12" r="2"/>
-              <circle cx="12" cy="18" r="2"/>
-            </svg>
-          </button>
-
-          {showMenu && (
-            <>
-              <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-20 min-w-[140px]">
-                <button
-                  onClick={() => {
-                    setShowMenu(false)
-                    onDelete(note.id)
-                  }}
-                  className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-50 text-sm font-medium"
-                >
-                  Delete
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Image - Instagram style with double-tap to like */}
-      {note.image_url && (
-        <div
-          className="relative w-full aspect-square bg-gray-100 cursor-pointer"
-          onDoubleClick={handleDoubleTap}
-        >
+  // Photo entry - Card with large-radius rounded corners
+  if (note.image_url) {
+    return (
+      <article className="editorial-card">
+        {/* Image with 3:2 aspect ratio */}
+        <div className="relative w-full aspect-[3/2] bg-stone-100">
           <Image
             src={note.image_url}
             alt={note.title}
@@ -160,128 +60,199 @@ export function NoteCard({ note, onDelete, onToggleFavorite }: NoteCardProps) {
             className="object-cover"
           />
 
-          {/* Double-tap heart animation */}
-          {likeAnimation && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <svg
-                className="w-24 h-24 text-white drop-shadow-lg animate-ping"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
+          {/* Favorite Badge */}
+          {note.is_favorite && (
+            <div className="absolute top-4 right-4 bg-[#1e40af] rounded-lg p-2">
+              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
               </svg>
             </div>
           )}
         </div>
-      )}
 
-      {/* No image - show gradient banner for essays/highlights */}
-      {!note.image_url && (note.type === 'essay' || note.type === 'highlight') && (
-        <div className={`w-full h-32 bg-gradient-to-br ${config.gradient} flex items-center justify-center`}>
-          <span className="text-5xl opacity-50">{config.icon}</span>
-        </div>
-      )}
-
-      {/* Actions - Instagram style */}
-      <div className="px-4 py-3">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-4">
-            {/* Like button */}
-            <button
-              onClick={handleLikeClick}
-              className="hover:scale-110 transition-transform active:scale-95"
-            >
-              <svg
-                className={`w-7 h-7 transition-colors ${liked ? 'text-red-500' : 'text-gray-800'}`}
-                fill={liked ? 'currentColor' : 'none'}
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-            </button>
-
-            {/* Comment icon (decorative) */}
-            <button className="hover:scale-110 transition-transform">
-              <svg className="w-7 h-7 text-gray-800" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-            </button>
-
-            {/* Share icon (decorative) */}
-            <button className="hover:scale-110 transition-transform">
-              <svg className="w-7 h-7 text-gray-800" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Bookmark/Save */}
-          <button
-            onClick={handleLikeClick}
-            className="hover:scale-110 transition-transform"
-          >
-            <svg
-              className={`w-7 h-7 ${liked ? 'text-gray-900' : 'text-gray-800'}`}
-              fill={liked ? 'currentColor' : 'none'}
-              stroke="currentColor"
-              strokeWidth={2}
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Likes count */}
-        {liked && (
-          <p className="text-sm font-semibold text-gray-900 mb-2">
-            Saved to favorites
+        {/* Content */}
+        <div className="p-6">
+          {/* Date Eyebrow */}
+          <p className="font-meta text-stone-400 mb-3">
+            {dateInfo.month} {dateInfo.day}, {dateInfo.year}
           </p>
-        )}
 
-        {/* Content - Instagram caption style */}
-        {note.content && (
-          <div className="mb-2">
-            <p className="text-sm text-gray-900">
-              <span className="font-semibold mr-1">{note.type === 'essay' ? 'Story' : 'Note'}</span>
+          {/* Title - Bold, centered */}
+          <h2 className="font-display text-xl text-stone-900 text-center mb-3">
+            {note.title}
+          </h2>
+
+          {/* Location */}
+          {(note.destinations || note.location) && (
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <svg className="w-4 h-4 text-[#4d7c0f]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span className="text-sm text-stone-500">
+                {[note.destinations?.city, note.location].filter(Boolean).join(' · ')}
+              </span>
+            </div>
+          )}
+
+          {/* Content Preview */}
+          {note.content && (
+            <p className="text-stone-600 leading-relaxed text-center">
               {shouldTruncate && !expanded ? (
                 <>
-                  {note.content.slice(0, 150)}...
+                  {note.content.slice(0, 180)}...
                   <button
                     onClick={() => setExpanded(true)}
-                    className="text-gray-500 ml-1 hover:text-gray-700"
+                    className="text-[#1e40af] font-medium ml-1 hover:underline"
                   >
-                    more
+                    Read more
                   </button>
                 </>
               ) : (
                 <span className="whitespace-pre-wrap">{note.content}</span>
               )}
             </p>
-            {expanded && shouldTruncate && (
-              <button
-                onClick={() => setExpanded(false)}
-                className="text-gray-500 text-sm hover:text-gray-700 mt-1"
-              >
-                Show less
-              </button>
-            )}
+          )}
+
+          {/* Rule Line */}
+          <div className="rule-line my-6" />
+
+          {/* Actions */}
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => onToggleFavorite(note.id, !note.is_favorite)}
+              className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                note.is_favorite ? 'text-[#1e40af]' : 'text-stone-400 hover:text-[#1e40af]'
+              }`}
+            >
+              <svg className="w-5 h-5" fill={note.is_favorite ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+              {note.is_favorite ? 'Saved' : 'Save'}
+            </button>
+
+            <button
+              onClick={() => {
+                if (confirm('Remove this entry?')) onDelete(note.id)
+              }}
+              className="text-sm text-stone-400 hover:text-red-500 transition-colors"
+            >
+              Remove
+            </button>
           </div>
+        </div>
+      </article>
+    )
+  }
+
+  // Text entry - Editorial card layout
+  return (
+    <article className="editorial-card p-6">
+      {/* Date Eyebrow */}
+      <p className="font-meta text-stone-400 mb-4">
+        {dateInfo.month} {dateInfo.day}, {dateInfo.year}
+      </p>
+
+      {/* Type Badge */}
+      <div className="flex items-center gap-3 mb-4">
+        <span className={`font-meta px-2.5 py-1 rounded-lg ${
+          note.type === 'essay' ? 'bg-[#1e40af]/10 text-[#1e40af]' :
+          note.type === 'highlight' ? 'bg-[#4d7c0f]/10 text-[#4d7c0f]' :
+          'bg-stone-100 text-stone-600'
+        }`}>
+          {note.type.charAt(0).toUpperCase() + note.type.slice(1)}
+        </span>
+
+        {/* Mood */}
+        {moodInfo && (
+          <span className="flex items-center gap-1.5 text-sm text-stone-400">
+            <span className="text-[#4d7c0f]">{moodInfo.icon}</span>
+            {moodInfo.label}
+          </span>
         )}
 
-        {/* Timestamp - Instagram style */}
-        <p className="text-xs text-gray-400 uppercase tracking-wide">
-          {formatDate(note.date)}
-        </p>
+        {/* Favorite */}
+        {note.is_favorite && (
+          <div className="ml-auto bg-[#1e40af]/10 rounded-lg p-1.5">
+            <svg className="w-4 h-4 text-[#1e40af]" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+          </div>
+        )}
       </div>
 
-      {/* Type badge - subtle */}
-      <div className="px-4 pb-3">
-        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${config.bg} ${config.color}`}>
-          {config.icon} {note.type.charAt(0).toUpperCase() + note.type.slice(1)}
-        </span>
+      {/* Location */}
+      {(note.destinations || note.location) && (
+        <div className="flex items-center gap-2 mb-3">
+          <svg className="w-4 h-4 text-[#4d7c0f]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span className="text-sm text-stone-500">
+            {[note.destinations?.city, note.location].filter(Boolean).join(' · ')}
+          </span>
+        </div>
+      )}
+
+      {/* Title */}
+      <h2 className="font-display text-xl text-stone-900 mb-3">
+        {note.title}
+      </h2>
+
+      {/* Content */}
+      {note.content && (
+        <div className={note.type === 'essay' ? 'font-body' : ''}>
+          <p className="text-stone-600 leading-relaxed whitespace-pre-wrap">
+            {shouldTruncate && !expanded ? (
+              <>
+                {note.content.slice(0, 280)}...
+                <button
+                  onClick={() => setExpanded(true)}
+                  className="text-[#1e40af] font-medium ml-1 hover:underline"
+                >
+                  Read more
+                </button>
+              </>
+            ) : (
+              note.content
+            )}
+          </p>
+          {expanded && shouldTruncate && (
+            <button
+              onClick={() => setExpanded(false)}
+              className="text-sm text-stone-400 hover:text-stone-600 mt-2"
+            >
+              Show less
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Rule Line */}
+      <div className="rule-line my-6" />
+
+      {/* Actions */}
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() => onToggleFavorite(note.id, !note.is_favorite)}
+          className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+            note.is_favorite ? 'text-[#1e40af]' : 'text-stone-400 hover:text-[#1e40af]'
+          }`}
+        >
+          <svg className="w-5 h-5" fill={note.is_favorite ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+          {note.is_favorite ? 'Saved' : 'Save'}
+        </button>
+
+        <button
+          onClick={() => {
+            if (confirm('Remove this entry?')) onDelete(note.id)
+          }}
+          className="text-sm text-stone-400 hover:text-red-500 transition-colors"
+        >
+          Remove
+        </button>
       </div>
     </article>
   )
